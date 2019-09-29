@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="modelo:jar">
+    <output-path>$PROJECT_DIR$/../..</output-path>
+    <root id="archive" name="modelo.jar">
+      <element id="module-output" name="modelo" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/zaxxer/HikariCP-java9ea/2.6.1/HikariCP-java9ea-2.6.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
