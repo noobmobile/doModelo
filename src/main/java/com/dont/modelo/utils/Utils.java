@@ -1,17 +1,16 @@
 package com.dont.modelo.utils;
 
 import com.dont.modelo.Terminal;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
@@ -41,6 +40,28 @@ public class Utils {
         measureTime(mensagem, runnable, Bukkit.getConsoleSender());
     }
 
+    public static List<ItemStack> getItemsByConfigurationSection(ConfigurationSection section) {
+        List<ItemStack> items = new ArrayList<>();
+        for (String key : section.getKeys(false)) {
+            String mkey = key + ".";
+            Material material = Material.valueOf(section.getString(mkey + "Material"));
+            int data = section.getInt(mkey + "Data");
+            int quantidade = section.getInt(mkey + "Quantidade");
+            String name = ChatColor.translateAlternateColorCodes('&', section.getString(mkey + "Name"));
+            List<String> lore = new ArrayList<>();
+            for (String s : section.getStringList(mkey + "Lore")) {
+                lore.add(ChatColor.translateAlternateColorCodes('&', s));
+            }
+            HashMap<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
+            for (String s : section.getStringList(mkey + "Enchants")) {
+                if (s.equalsIgnoreCase("nulo")) break;
+                String[] splited = s.split(":");
+                enchants.put(Enchantment.getByName(splited[0]), Integer.valueOf(splited[1]));
+            }
+            items.add(new ItemBuilder(material, quantidade, data).setName(name).setLore(lore).addEnchantments(enchants).toItemStack());
+        }
+        return items;
+    }
 
     public static String converterTempo(long millis) {
         long secondsIn = millis / 1000l;
