@@ -58,7 +58,7 @@ public class Utils {
                 String[] splited = s.split(":");
                 enchants.put(Enchantment.getByName(splited[0]), Integer.valueOf(splited[1]));
             }
-            items.add(new ItemBuilder(material, quantidade, data).setName(name).setLore(lore).addEnchantments(enchants).toItemStack());
+            items.add(new ItemComposer(material, quantidade, data).setName(name).setLore(lore).addEnchantments(enchants).toItemStack());
         }
         return items;
     }
