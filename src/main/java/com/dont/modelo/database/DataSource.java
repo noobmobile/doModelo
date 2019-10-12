@@ -21,6 +21,7 @@ public class DataSource {
         hikariConfig.setJdbcUrl(url);
         hikariConfig.setUsername(user);
         hikariConfig.setPassword(password);
+        hikariConfig.setMaximumPoolSize(3);
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

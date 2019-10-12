@@ -7,9 +7,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b93be2a-38e8-4cce-8f47-5e3a7825ad48" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/utils/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/Terminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/Terminal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/DataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/DataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/utils/ItemBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/utils/ItemBuilder.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

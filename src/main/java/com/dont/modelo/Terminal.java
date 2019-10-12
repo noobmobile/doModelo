@@ -20,7 +20,7 @@ public class Terminal extends JavaPlugin {
 
     private DataSource dataSource;
     private DataManager dataManager;
-    private DoConfig configManager;
+    private ConfigManager configManager;
     private Economy economy;
 
     public void onEnable() {
@@ -70,7 +70,7 @@ public class Terminal extends JavaPlugin {
         return dataManager;
     }
 
-    public DoConfig getConfigManager() {
+    public ConfigManager getConfigManager() {
         return configManager;
     }
 

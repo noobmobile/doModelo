@@ -119,7 +119,7 @@ public class ItemBuilder {
    }
 
    public ItemBuilder addEnchantments(Map<Enchantment, Integer> enchantments){
-     is.addEnchantments(enchantments);
+     is.addUnsafeEnchantments(enchantments);
      return this;
    }
 
