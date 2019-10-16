@@ -1,6 +1,7 @@
 package com.dont.modelo.database;
 
 import com.dont.modelo.models.database.Storable;
+import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,7 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,6 +30,34 @@ public class DataManager {
         gson = gsonBuilder.create();
         cache = new HashMap<>();
         executor = Executors.newFixedThreadPool(5);
+    }
+
+    public List<User> getOfflineUsers(){
+        List<User> users = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()){
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `"+dataSource.tableName+"`");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                if (cache.containsKey(resultSet.getString("key"))) continue;
+                users.add(gson.fromJson( resultSet.getString("json"), User.class));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    public void deleteOldUsers(){
+        Utils.measureTime("deletado usuarios em <tempo>ms", () -> {
+            int deletado = 0;
+            for (User user : getOfflineUsers()){
+                if (user.canBeDeleted()){
+                    delete(user.getName(), true);
+                    deletado++;
+                }
+            }
+            System.out.println("deletado "+deletado+" usuarios");
+        });
     }
 
     public boolean exists(String key) {
@@ -66,6 +97,22 @@ public class DataManager {
             } catch (SQLException e) {
                 e.printStackTrace();
                 Utils.debug(Utils.LogType.DEBUG, "erro ao salvar " + storable.getClass().getSimpleName().toLowerCase() + " em " + (async ? "a" : "") + "sync na tabela");
+            }
+        };
+
+        if (async) executor.submit(runnable);
+        else runnable.run();
+
+    }
+
+    public void delete(String key, boolean async){
+        Runnable runnable = () -> {
+            try (Connection connection = dataSource.getConnection()){
+                PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM `"+dataSource.tableName+"` WHERE `key` = ?");
+                preparedStatement.setString(1, key);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e){
+                e.printStackTrace();
             }
         };
 

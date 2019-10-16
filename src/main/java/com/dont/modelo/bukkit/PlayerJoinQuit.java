@@ -26,10 +26,11 @@ public class PlayerJoinQuit extends DoListener {
             return;
         if (manager.exists(e.getName())) {
             User user = manager.get(e.getName(), User.class);
+            user.setLastActivity(System.currentTimeMillis());
             manager.cache.put(e.getName(), user);
             Utils.debug(Utils.LogType.DEBUG, "Pegando player " + e.getName() + " do mysql");
         } else {
-            manager.cache.put(e.getName(), new User(e.getName()));
+            manager.cache.put(e.getName(), new User(e.getName(), System.currentTimeMillis()));
             Utils.debug(Utils.LogType.DEBUG, "Criando novo player no mysql " + e.getName());
         }
     }
@@ -39,6 +40,7 @@ public class PlayerJoinQuit extends DoListener {
         if (!manager.cache.containsKey(e.getPlayer().getName()))
             return;
         User user = (User) manager.cache.get(e.getPlayer().getName());
+        user.setLastActivity(System.currentTimeMillis());
         manager.insert(user, true);
         manager.cache.remove(user.getName());
         user = null;

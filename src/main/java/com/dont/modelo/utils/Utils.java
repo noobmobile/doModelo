@@ -64,38 +64,29 @@ public class Utils {
     }
 
     public static String converterTempo(long millis) {
-        long secondsIn = millis / 1000l;
-        long dayCount = TimeUnit.SECONDS.toDays(secondsIn);
-        long secondsCount = secondsIn - TimeUnit.DAYS.toSeconds(dayCount);
-        long hourCount = TimeUnit.SECONDS.toHours(secondsCount);
-        secondsCount -= TimeUnit.HOURS.toSeconds(hourCount);
-        long minutesCount = TimeUnit.SECONDS.toMinutes(secondsCount);
-        secondsCount -= TimeUnit.MINUTES.toSeconds(minutesCount);
-        StringBuilder sb = new StringBuilder();
-        if (dayCount!=0) sb.append(String.format("%d %s, ", dayCount, (dayCount == 1) ? "dia"
-                : "dias"));
-        if (hourCount!=0) sb.append(String.format("%d %s, ", hourCount, (hourCount == 1) ? "hora"
-                : "horas"));
-        if (minutesCount!=0) sb.append(String.format("%d %s e ", minutesCount,
-                (minutesCount == 1) ? "minuto" : "minutos"));
-        if (secondsCount!=0) sb.append(String.format("%d %s.", secondsCount,
-                (secondsCount == 1) ? "segundo" : "segundos"));
-        return sb.toString();
+        return Time.of(millis)
+                .day(i -> i + (i == 1 ? " dia" : " dias"))
+                .hour(i -> i + (i == 1 ? " hora" : " horas"))
+                .min(i -> i + (i == 1 ? " minuto" : " minutos"))
+                .sec(i -> i + (i == 1 ? " segundo" : " segundos"))
+                .and("e").get();
     }
 
 
     public static boolean DEBUGGING = true;
     public static void debug(LogType type, String mensagem){
         if (type == LogType.DEBUG && !DEBUGGING) return;
-        Bukkit.getConsoleSender().sendMessage(prefix + mensagem);
+        Bukkit.getConsoleSender().sendMessage("["+type.name()+"] "+ prefix + mensagem);
     }
 
     public static String getSerializedLocation(Location loc) {
+        if (loc == null) return null;
         return loc.getX() + ";" + loc.getY() + ";" + loc.getZ() + ";" + loc.getYaw() + ";" + loc.getPitch()
                 + ";" + loc.getWorld().getUID();
     }
 
     public static Location getDeserializedLocation(String s) {
+        if (s == null || !s.contains(";")) return null;
         String [] parts = s.split(";");
         double x = Double.parseDouble(parts[0]);
         double y = Double.parseDouble(parts[1]);

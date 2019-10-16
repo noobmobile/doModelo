@@ -41,14 +41,15 @@ public class Terminal extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-
+        dataManager.deleteOldUsers();
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (dataManager.exists(player.getName())) {
                 User user = dataManager.get(player.getName(), User.class);
+                user.setLastActivity(System.currentTimeMillis());
                 dataManager.cache.put(player.getName(), user);
                 Utils.debug(Utils.LogType.DEBUG, "Pegando player " + player.getName() + " do mysql");
             } else {
-                dataManager.cache.put(player.getName(), new User(player.getName()));
+                dataManager.cache.put(player.getName(), new User(player.getName(), System.currentTimeMillis()));
                 Utils.debug(Utils.LogType.DEBUG, "Criando novo player no mysql " + player.getName());
             }
         }
