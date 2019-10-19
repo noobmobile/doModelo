@@ -1,4 +1,5 @@
-MySQL:
+Database:
+  Tipo: MYSQL #Tipos válidos: MYSQL, MONGODB, SQLITE
   IP: localhost:3306
   DB: test
   User: admin

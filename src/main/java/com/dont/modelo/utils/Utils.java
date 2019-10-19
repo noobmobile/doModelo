@@ -20,7 +20,7 @@ public class Utils {
     }
 
     private static final Terminal main = Terminal.getPlugin(Terminal.class);
-    private static final String prefix = ChatColor.AQUA + "[" + main.getName()+"] " + ChatColor.WHITE;;
+    private static final String prefix = ChatColor.GREEN + "[" + main.getName()+"] " + ChatColor.WHITE;;
 
     private static final DecimalFormatSymbols DFS = new DecimalFormatSymbols(new Locale("pt", "BR"));
     public static final DecimalFormat FORMATTER = new DecimalFormat("###,###,###", DFS);

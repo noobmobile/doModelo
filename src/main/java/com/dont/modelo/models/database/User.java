@@ -1,5 +1,7 @@
 package com.dont.modelo.models.database;
 
+import com.dont.modelo.database.DataManager;
+
 public class User implements Storable{
 
     private final static long DELETE_TIME = 1000l * 60 * 60 * 24 * 14;
@@ -22,6 +24,15 @@ public class User implements Storable{
 
     public void setLastActivity(long lastActivity) {
         this.lastActivity = lastActivity;
+    }
+
+    /**
+     * atualiza o player na database caso não esteja no cache
+     */
+    public void offlineSave(DataManager manager){
+        if (!manager.isCached(name)){
+            manager.getDataSource().insert(this, true);
+        }
     }
 
     @Override

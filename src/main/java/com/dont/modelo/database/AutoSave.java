@@ -18,8 +18,8 @@ public class AutoSave extends BukkitRunnable {
         Utils.debug(Utils.LogType.DEBUG, "Iniciando auto save");
         long before = System.currentTimeMillis();
         int i = 0;
-        for (Storable storable : main.getDataManager().cache.values()) {
-            main.getDataManager().insert(storable, true);
+        for (Storable storable : main.getDataManager().getCached()) {
+            main.getDataManager().getDataSource().insert(storable, true);
             i++;
         }
         long now = System.currentTimeMillis();

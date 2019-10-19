@@ -3,122 +3,83 @@ package com.dont.modelo.database;
 import com.dont.modelo.models.database.Storable;
 import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class DataManager {
+public class DataManager{
 
-    public final HashMap<String, Storable> cache;
-    private final DataSource dataSource;
-    private final Gson gson;
-    private final ExecutorService executor;
-
-    public DataManager(DataSource dataSource) {
+    private final IDataSource dataSource;
+    private final HashMap<String, Storable> cache;
+    public DataManager(IDataSource dataSource){
         this.dataSource = dataSource;
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.enableComplexMapKeySerialization();
-        gson = gsonBuilder.create();
-        cache = new HashMap<>();
-        executor = Executors.newFixedThreadPool(5);
+        this.cache = new HashMap<>();
     }
 
-    public List<User> getOfflineUsers(){
-        List<User> users = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection()){
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `"+dataSource.tableName+"`");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
-                if (cache.containsKey(resultSet.getString("key"))) continue;
-                users.add(gson.fromJson( resultSet.getString("json"), User.class));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return users;
+    public <T extends Storable> T get(String key){
+        return (T) cache.get(key);
+    }
+
+    public void cache(Storable storable){
+        cache.put(storable.getName(), storable);
+    }
+
+    public void uncache(String key){
+        cache.remove(key);
+    }
+
+    public boolean isCached(String key){
+        return cache.containsKey(key);
+    }
+
+    public Collection<Storable> getCached(){
+        return cache.values();
+    }
+
+    /**
+     *
+     * @param clazz
+     * @param <T>
+     * @return storables que não estão no cache, modificar-los não irá alterar nada
+     */
+    public <T extends Storable> List<T> getNonCached(Class<T> clazz){
+        List<T> storables = dataSource.getAll(clazz);
+        storables.removeIf(storable -> cache.containsKey(storable.getName()));
+        return storables;
+    }
+
+    /**
+     *
+     * @param clazz
+     * @param <T>
+     * @return storables offlines mais os que estão no cache
+     */
+    public <T extends Storable>  List<T> getAll(Class<T> clazz){
+        List<T> cached = getCached().stream().filter(storable -> clazz.isAssignableFrom(storable.getClass())).map(clazz::cast).collect(Collectors.toList());
+        List<T> nonCached = getNonCached(clazz);
+        return Stream.of(cached, nonCached).flatMap(list -> list.stream()).collect(Collectors.toList());
+    }
+
+    public IDataSource getDataSource() {
+        return dataSource;
     }
 
     public void deleteOldUsers(){
         Utils.measureTime("deletado usuarios em <tempo>ms", () -> {
             int deletado = 0;
-            for (User user : getOfflineUsers()){
+            for (User user : getNonCached(User.class)){
                 if (user.canBeDeleted()){
-                    delete(user.getName(), true);
+                    Utils.debug(Utils.LogType.DEBUG, "deletado "+user.getName()+"");
+                    dataSource.delete(user.getName(), true);
                     deletado++;
                 }
             }
-            System.out.println("deletado "+deletado+" usuarios");
+            Utils.debug(Utils.LogType.DEBUG, "deletado "+deletado+" usuarios");
         });
-    }
-
-    public boolean exists(String key) {
-        try (Connection connection = dataSource.getConnection()){
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + dataSource.tableName + "` WHERE `key` = ?");
-            preparedStatement.setString(1, key);
-            return preparedStatement.executeQuery().next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public <T extends Storable> T get(String key, Class<? extends T> clazz) {
-        try (Connection connection = dataSource.getConnection()){
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + dataSource.tableName + "` WHERE `key` = ?");
-            preparedStatement.setString(1, key);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return gson.fromJson(resultSet.getString("json"), clazz);
-            }
-            return null;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public void insert(Storable storable, boolean async) {
-        Runnable runnable = () -> {
-            try (Connection connection = dataSource.getConnection()){
-                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `" + dataSource.tableName + "`(`key`, `json`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `json` = VALUES(`json`)");
-                preparedStatement.setString(1, storable.getName());
-                preparedStatement.setString(2, gson.toJson(storable));
-                preparedStatement.executeUpdate();
-                Utils.debug(Utils.LogType.DEBUG, "salvando " + storable.getClass().getSimpleName().toLowerCase() + " em " + (async ? "a" : "") + "sync na tabela");
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Utils.debug(Utils.LogType.DEBUG, "erro ao salvar " + storable.getClass().getSimpleName().toLowerCase() + " em " + (async ? "a" : "") + "sync na tabela");
-            }
-        };
-
-        if (async) executor.submit(runnable);
-        else runnable.run();
-
-    }
-
-    public void delete(String key, boolean async){
-        Runnable runnable = () -> {
-            try (Connection connection = dataSource.getConnection()){
-                PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM `"+dataSource.tableName+"` WHERE `key` = ?");
-                preparedStatement.setString(1, key);
-                preparedStatement.executeUpdate();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
-        };
-
-        if (async) executor.submit(runnable);
-        else runnable.run();
-
     }
 
 }

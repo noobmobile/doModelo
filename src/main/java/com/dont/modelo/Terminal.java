@@ -1,81 +1,63 @@
 package com.dont.modelo;
 
 import com.dont.modelo.bukkit.PlayerJoinQuit;
-import com.dont.modelo.config.DoConfig;
-import com.dont.modelo.database.AutoSave;
-import com.dont.modelo.database.DataManager;
-import com.dont.modelo.database.DataSource;
 import com.dont.modelo.config.ConfigManager;
-import com.dont.modelo.models.database.Storable;
+import com.dont.modelo.database.*;
 import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Terminal extends JavaPlugin {
 
-    private DataSource dataSource;
-    private DataManager dataManager;
-    private ConfigManager configManager;
     private Economy economy;
-
-    public void onEnable() {
+    private ConfigManager configManager;
+    public IDataSource dataSource;
+    public DataManager dataManager;
+    public void onEnable(){
         saveDefaultConfig();
         Utils.debug(Utils.LogType.INFO, "Plugin iniciado, by don't");
-        Utils.DEBUGGING = getConfig().getBoolean("MySQL.Debug");
-        System.out.println("Modo debug: "+Utils.DEBUGGING);
-        this.configManager = new ConfigManager(this);
-        this.dataSource = new DataSource(this, getConfig().getString("MySQL.IP"), getConfig().getString("MySQL.User"), getConfig().getString("MySQL.DB"), getConfig().getString("MySQL.Pass"));
-        if (dataSource.isClosed()) return;
-        this.dataManager = new DataManager(dataSource);
-        new AutoSave(this);
+        Utils.DEBUGGING = getConfig().getBoolean("Database.Debug");
+        if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MONGODB")) dataSource = new MongoSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL")) dataSource = new MySQLSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+        else dataSource = new SQLiteSource();
+        if (dataSource == null || dataSource.isClosed()) return;
+        dataManager = new DataManager(dataSource);
         setup();
     }
 
-    private void setup() {
+    public void onDisable(){
+        Utils.debug(Utils.LogType.INFO, "Plugin desligado");
+        if (dataSource == null) return;
+        dataManager.getCached().forEach(storable -> dataSource.insert(storable, false));
+        dataSource.close();
+    }
+
+    private void setup(){
+        configManager = new ConfigManager(this);
         if (!setupEconomy()) {
             Bukkit.getConsoleSender().sendMessage("§eVault não encontrado");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
         dataManager.deleteOldUsers();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (dataManager.exists(player.getName())) {
-                User user = dataManager.get(player.getName(), User.class);
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            if (dataSource.exists(player.getName())){
+                User user = dataSource.find(player.getName(), User.class);
                 user.setLastActivity(System.currentTimeMillis());
-                dataManager.cache.put(player.getName(), user);
-                Utils.debug(Utils.LogType.DEBUG, "Pegando player " + player.getName() + " do mysql");
+                dataManager.cache(user);
+                Utils.debug(Utils.LogType.DEBUG, "puxando player "+player.getName()+" da tabela");
             } else {
-                dataManager.cache.put(player.getName(), new User(player.getName(), System.currentTimeMillis()));
-                Utils.debug(Utils.LogType.DEBUG, "Criando novo player no mysql " + player.getName());
+                User user = new User(player.getName(), System.currentTimeMillis());
+                dataManager.cache(user);
+                Utils.debug(Utils.LogType.DEBUG, "criando player "+player.getName()+" na tabela");
             }
-        }
+        });
+        new AutoSave(this);
         new PlayerJoinQuit(this);
-    }
-
-
-    public void onDisable() {
-        if (dataSource == null) return;
-        Utils.debug(Utils.LogType.INFO, "Plugin desligado");
-        for (Storable storable : dataManager.cache.values()) {
-            dataManager.insert(storable, false);
-        }
-        dataSource.close();
-    }
-
-    public DataManager getDataManager() {
-        return dataManager;
-    }
-
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    public void reloadConfigManager(){
-        this.configManager = new ConfigManager(this);
     }
 
     private boolean setupEconomy() {
@@ -90,4 +72,15 @@ public class Terminal extends JavaPlugin {
         return economy;
     }
 
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public void reloadConfigManager(){
+        this.configManager = new ConfigManager(this);
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
 }
