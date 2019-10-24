@@ -8,15 +8,19 @@ public interface IDataSource {
 
     /**
      *
-     * @param key
-     * @return storable salvo no database
+     * @param key key que esteja a procurar
+     * @param clazz classe que queira que retorne
+     * @return storable desejado
      */
     public <T extends Storable> T find(String key, Class<T> clazz);
 
     public void insert(Storable storable, boolean async);
     public void delete(String key, boolean async);
+
     /**
-     * @return tudo que não está no cache
+     *
+     * @param clazz classe que queira que retorne
+     * @return lista de storables desejado
      */
     public <T extends Storable> List<T> getAll(Class<T> clazz);
     /**

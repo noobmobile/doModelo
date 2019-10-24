@@ -15,8 +15,8 @@ public class Terminal extends JavaPlugin {
 
     private Economy economy;
     private ConfigManager configManager;
-    public IDataSource dataSource;
-    public DataManager dataManager;
+    private IDataSource dataSource;
+    private DataManager dataManager;
     public void onEnable(){
         saveDefaultConfig();
         Utils.debug(Utils.LogType.INFO, "Plugin iniciado, by don't");

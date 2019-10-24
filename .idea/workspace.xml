@@ -7,20 +7,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b93be2a-38e8-4cce-8f47-5e3a7825ad48" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/IDataSource.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/MongoSource.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/MySQLSource.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/SQLiteSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/Terminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/Terminal.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/bukkit/PlayerJoinQuit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/bukkit/PlayerJoinQuit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/AutoSave.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/AutoSave.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/DataManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/DataManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/DataSource.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/models/database/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/models/database/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/utils/Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/IDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dont/modelo/database/IDataSource.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

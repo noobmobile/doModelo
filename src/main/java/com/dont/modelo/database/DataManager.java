@@ -61,7 +61,7 @@ public class DataManager{
     public <T extends Storable>  List<T> getAll(Class<T> clazz){
         List<T> cached = getCached().stream().filter(storable -> clazz.isAssignableFrom(storable.getClass())).map(clazz::cast).collect(Collectors.toList());
         List<T> nonCached = getNonCached(clazz);
-        return Stream.of(cached, nonCached).flatMap(list -> list.stream()).collect(Collectors.toList());
+        return Stream.of(cached, nonCached).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     public IDataSource getDataSource() {
