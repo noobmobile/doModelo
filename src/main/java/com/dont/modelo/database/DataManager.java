@@ -42,8 +42,6 @@ public class DataManager{
 
     /**
      *
-     * @param clazz
-     * @param <T>
      * @return storables que não estão no cache, modificar-los não irá alterar nada
      */
     public <T extends Storable> List<T> getNonCached(Class<T> clazz){
@@ -54,8 +52,6 @@ public class DataManager{
 
     /**
      *
-     * @param clazz
-     * @param <T>
      * @return storables offlines mais os que estão no cache
      */
     public <T extends Storable>  List<T> getAll(Class<T> clazz){

@@ -51,7 +51,24 @@ public class InventoryHandler {
 		inventory.setItem(slot, item);
 		return this;
 	}
-	
+
+	public InventoryHandler fill(ItemStack item, boolean replace){
+		for (int i = 0; i < inventory.getSize(); i++){
+			if (inventory.getItem(i) == null || replace)
+				inventory.setItem(i,item);
+		}
+		return this;
+	}
+
+	public InventoryHandler fill(ItemStack item){
+		return fill(item,true);
+	}
+
+	public InventoryHandler item(ItemStack item, int... slot) {
+		for (int i : slot) inventory.setItem(i, item);
+		return this;
+	}
+
 	public Inventory getInventory() {
 		return this.inventory;
 	}

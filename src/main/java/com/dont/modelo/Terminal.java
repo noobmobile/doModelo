@@ -9,7 +9,6 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Terminal extends JavaPlugin {
 
@@ -22,7 +21,8 @@ public class Terminal extends JavaPlugin {
         Utils.debug(Utils.LogType.INFO, "Plugin iniciado, by don't");
         Utils.DEBUGGING = getConfig().getBoolean("Database.Debug");
         if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MONGODB")) dataSource = new MongoSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
-        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL")) dataSource = new MySQLSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL_POOLING")) dataSource = new MySQLPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL_PURO")) dataSource = new MySQLNoPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
         else dataSource = new SQLiteSource();
         if (dataSource == null || dataSource.isClosed()) return;
         dataManager = new DataManager(dataSource);
