@@ -15,7 +15,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 /**
- * 
+ *
  * @author don't
  *
  */
@@ -34,19 +34,19 @@ public class InventoryHandler {
 			}
 		}, main);
 	}
-	
+
 	private Inventory inventory;
 	private Consumer<InventoryClickEvent> handler;
-	
+
 	public InventoryHandler(String name, int size) {
 		this.inventory = Bukkit.createInventory(new HandlerHolder(this), size, name);
 	}
-	
+
 	public InventoryHandler handler(Consumer<InventoryClickEvent> handler) {
 		this.handler = handler;
 		return this;
 	}
-	
+
 	public InventoryHandler item(int slot, ItemStack item) {
 		inventory.setItem(slot, item);
 		return this;
@@ -69,18 +69,23 @@ public class InventoryHandler {
 		return this;
 	}
 
+	public InventoryHandler items(Consumer<Inventory> consumer){
+		consumer.accept(this.inventory);
+		return this;
+	}
+
 	public Inventory getInventory() {
 		return this.inventory;
 	}
-	
+
 	public void open(Player player) {
 		player.openInventory(this.inventory);
 	}
-	
+
 	private class HandlerHolder implements InventoryHolder {
 
 		private InventoryHandler handler;
-		
+
 		public HandlerHolder(InventoryHandler handler) {
 			super();
 			this.handler = handler;
@@ -94,7 +99,7 @@ public class InventoryHandler {
 		public InventoryHandler getInventoryHandler() {
 			return handler;
 		}
-		
+
 	}
-	
+
 }

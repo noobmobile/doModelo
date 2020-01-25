@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.DecimalFormat;
@@ -22,6 +23,13 @@ public class Utils {
     private static final Terminal main = Terminal.getPlugin(Terminal.class);
     private static final String prefix = ChatColor.GREEN + "[" + main.getName()+"] " + ChatColor.WHITE;;
 
+    public static boolean DEBUGGING = true;
+    public static void debug(LogType type, String mensagem){
+        if (type == LogType.DEBUG && !DEBUGGING) return;
+        Bukkit.getConsoleSender().sendMessage("["+type.name()+"] "+ prefix + mensagem);
+    }
+
+
     private static final DecimalFormatSymbols DFS = new DecimalFormatSymbols(new Locale("pt", "BR"));
     public static final DecimalFormat FORMATTER = new DecimalFormat("###,###,###", DFS);
     public static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy 'as' HH:mm:ss");
@@ -38,6 +46,27 @@ public class Utils {
 
     public static void measureTime(String mensagem, Runnable runnable){
         measureTime(mensagem, runnable, Bukkit.getConsoleSender());
+    }
+
+    public static final List<Integer> ALLOWED = Arrays.asList(
+            10,11,12,13,14,15,16,
+            19,20,21,22,23,24,25,
+            28,29,30,31,32,33,34);
+
+    public static void setupItems(Inventory inventory, List<ItemStack> items){
+        setupItems(inventory,items,ALLOWED);
+    }
+
+    public static void setupItems(Inventory inventory, List<ItemStack> items, List<Integer> allowed){
+        int lastIndex = 0;
+        for (int i = 0; i < 54; i++) {
+            if (!allowed.contains(i))
+                continue;
+            if (lastIndex >= items.size())
+                break;
+            inventory.setItem(i, items.get(lastIndex));
+            lastIndex++;
+        }
     }
 
     public static List<ItemStack> getItemsByConfigurationSection(ConfigurationSection section) {
@@ -73,11 +102,6 @@ public class Utils {
     }
 
 
-    public static boolean DEBUGGING = true;
-    public static void debug(LogType type, String mensagem){
-        if (type == LogType.DEBUG && !DEBUGGING) return;
-        Bukkit.getConsoleSender().sendMessage("["+type.name()+"] "+ prefix + mensagem);
-    }
 
     public static String getSerializedLocation(Location loc) {
         if (loc == null) return null;

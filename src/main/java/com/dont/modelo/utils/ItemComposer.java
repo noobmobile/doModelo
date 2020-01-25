@@ -36,7 +36,7 @@ public class ItemComposer {
 	public ItemComposer(Material material) {
 		this.item = new ItemStack(material);
 	}
-	
+
 	public ItemComposer(Material material, int amount, int durability) {
 		this.item = new ItemStack(material, amount, (short) durability);
 	}
@@ -50,7 +50,7 @@ public class ItemComposer {
 		if (!url.startsWith("http://textures.minecraft.net/texture/")) url = "http://textures.minecraft.net/texture/" + url;
 		try {
 			SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-			GameProfile profile = new GameProfile(UUID.randomUUID(), UUID.randomUUID().toString());
+			GameProfile profile = new GameProfile(UUID.nameUUIDFromBytes(url.getBytes()), null);
 			profile.getProperties().put("textures", new Property("textures", new String(Base64.encodeBase64(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes()))));
 			Field profileField = skullMeta.getClass().getDeclaredField("profile");
 			profileField.setAccessible(true);
@@ -61,11 +61,11 @@ public class ItemComposer {
 		}
 		this.item = skull;
 	}
-	
+
 	public static ItemComposer of(Material material) {
 		return new ItemComposer(material);
 	}
-	
+
 	public static ItemComposer of(Material material, int amount, int durability) {
 		return new ItemComposer(material, amount, durability);
 	}
@@ -73,7 +73,7 @@ public class ItemComposer {
 	public static ItemComposer of(ItemStack item) {
 		return new ItemComposer(item);
 	}
-	
+
 	public static ItemComposer of(String url) {
 		return new ItemComposer(url);
 	}
@@ -104,6 +104,26 @@ public class ItemComposer {
 
 	public ItemComposer setLore(String... lore) {
 		return setLore(Arrays.asList(lore));
+	}
+
+	public ItemComposer addLore(String... lore){
+		return addLore(Arrays.asList(lore));
+	}
+
+	public ItemComposer addLore(List<String> lore){
+		composeMeta(meta -> {
+			List<String> newLore = meta.getLore();
+			newLore.addAll((lore));
+			meta.setLore(newLore);
+		});
+		return this;
+	}
+
+	public ItemComposer addGlow(boolean glow){
+		if (!glow) return this;
+		compose(it -> it.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE,1));
+		composeMeta(meta -> meta.addItemFlags(ItemFlag.HIDE_ENCHANTS));
+		return this;
 	}
 
 	public ItemComposer setAmount(int amount) {

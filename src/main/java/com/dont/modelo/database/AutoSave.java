@@ -10,7 +10,7 @@ public class AutoSave extends BukkitRunnable {
     private final Terminal main;
     public AutoSave(Terminal main) {
         this.main = main;
-        runTaskTimerAsynchronously(main, 20l*60*10, 20l*60*10);
+        runTaskTimerAsynchronously(main, 20l*60*30, 20l*60*30);
     }
 
     @Override
