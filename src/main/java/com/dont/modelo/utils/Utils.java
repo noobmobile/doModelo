@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,6 +23,7 @@ public class Utils {
 
     private static final Terminal main = Terminal.getPlugin(Terminal.class);
     private static final String prefix = ChatColor.GREEN + "[" + main.getName()+"] " + ChatColor.WHITE;;
+    public static final ItemStack EMPTY = new ItemComposer(Material.WEB).setName("§eNada encontrado").toItemStack(), BACK = new ItemComposer(Material.ARROW).setName("§7Voltar").toItemStack();
 
     public static boolean DEBUGGING = true;
     public static void debug(LogType type, String mensagem){
@@ -33,6 +35,19 @@ public class Utils {
     private static final DecimalFormatSymbols DFS = new DecimalFormatSymbols(new Locale("pt", "BR"));
     public static final DecimalFormat FORMATTER = new DecimalFormat("###,###,###", DFS);
     public static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy 'as' HH:mm:ss");
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,###.##");
+    private static final String[] NUMBER_SUFFIX = new String[]{"K", "M", "B", "T", "Q", "QQ", "S", "SS", "O", "N", "D", "UN", "DD", "TR", "QT", "QN", "SD", "SPD", "OD", "ND", "VG", "UVG", "DVG", "TVG", "QTV"};
+
+    public static String format(double value) {
+        if (value < 1000) return ((int) value) + "";
+        return format(value, 0);
+    }
+
+    private static String format(double n, int iteration) {
+        double f = (n / 100D) / 10.0D;
+        return f < 1000 || iteration >= NUMBER_SUFFIX.length - 1 ? DECIMAL_FORMAT.format(f) + NUMBER_SUFFIX[iteration] : format(f, iteration + 1);
+    }
 
     public static long measureTime(Runnable runnable){
         long before = System.currentTimeMillis();
@@ -67,6 +82,19 @@ public class Utils {
             inventory.setItem(i, items.get(lastIndex));
             lastIndex++;
         }
+    }
+
+    public static void removeItemFromHand(Player player, int amount) {
+        ItemStack item = player.getItemInHand();
+        if (item.getAmount() > amount) {
+            item.setAmount(item.getAmount() - amount);
+        } else {
+            player.setItemInHand(new ItemStack(Material.AIR));
+        }
+    }
+
+    public static void removeItemFromHand(Player player) {
+        removeItemFromHand(player, 1);
     }
 
     public static List<ItemStack> getItemsByConfigurationSection(ConfigurationSection section) {
@@ -106,7 +134,7 @@ public class Utils {
     public static String getSerializedLocation(Location loc) {
         if (loc == null) return null;
         return loc.getX() + ";" + loc.getY() + ";" + loc.getZ() + ";" + loc.getYaw() + ";" + loc.getPitch()
-                + ";" + loc.getWorld().getUID();
+                + ";" + loc.getWorld().getName();
     }
 
     public static Location getDeserializedLocation(String s) {
@@ -117,8 +145,7 @@ public class Utils {
         double z = Double.parseDouble(parts[2]);
         float yaw = Float.parseFloat(parts[3]);
         float pitch = Float.parseFloat(parts[4]);
-        UUID u = UUID.fromString(parts[5]);
-        World w = Bukkit.getServer().getWorld(u);
+        World w = Bukkit.getServer().getWorld(parts[5]);
         return new Location(w, x, y, z, yaw, pitch);
     }
 

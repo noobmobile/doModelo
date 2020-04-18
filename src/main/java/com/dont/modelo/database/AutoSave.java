@@ -19,7 +19,7 @@ public class AutoSave extends BukkitRunnable {
         long before = System.currentTimeMillis();
         int i = 0;
         for (Storable storable : main.getDataManager().getCached()) {
-            main.getDataManager().getDataSource().insert(storable, true);
+            main.getDataManager().getDataSource().insert(storable, false); // não precisa ser em async já que já é em async
             i++;
         }
         long now = System.currentTimeMillis();

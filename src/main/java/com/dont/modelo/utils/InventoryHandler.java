@@ -3,6 +3,7 @@ package com.dont.modelo.utils;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import com.dont.licensesystem.Terminal.AtlasPluginClassLoader.AtlasPlugin;
 import com.dont.modelo.Terminal;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 /**
  *
@@ -22,7 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class InventoryHandler {
 
 	static {
-		JavaPlugin main = Terminal.getPlugin(Terminal.class);
+		AtlasPlugin main = Terminal.getPlugin(Terminal.class);
 		Bukkit.getPluginManager().registerEvents(new Listener() {
 			@EventHandler
 			public void onClick(InventoryClickEvent e) {

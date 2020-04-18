@@ -29,7 +29,7 @@ public class PlayerJoinQuit extends DoListener {
                 manager.cache(user);
                 Utils.debug(Utils.LogType.DEBUG, "puxando player "+e.getName()+" da tabela");
             } else {
-                User user = new User(e.getName(), System.currentTimeMillis());
+                User user = new User(e.getName());
                 manager.cache(user);
                 Utils.debug(Utils.LogType.DEBUG, "criando player "+e.getName()+" na tabela");
             }

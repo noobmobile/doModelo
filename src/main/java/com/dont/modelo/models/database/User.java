@@ -9,9 +9,9 @@ public class User implements Storable{
     private String name;
     private long lastActivity;
 
-    public User(String name, long lastActivity) {
+    public User(String name) {
         this.name = name;
-        this.lastActivity = lastActivity;
+        this.lastActivity = System.currentTimeMillis();
     }
 
     public boolean canBeDeleted(){
@@ -36,8 +36,11 @@ public class User implements Storable{
     }
 
     @Override
-    public String getName() {
+    public String getKey() {
         return name;
     }
 
+    public String getName() {
+        return name;
+    }
 }

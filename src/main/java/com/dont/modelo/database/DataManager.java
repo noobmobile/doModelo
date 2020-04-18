@@ -25,7 +25,7 @@ public class DataManager{
     }
 
     public void cache(Storable storable){
-        cache.put(storable.getName(), storable);
+        cache.put(storable.getKey(), storable);
     }
 
     public void uncache(String key){
@@ -40,13 +40,17 @@ public class DataManager{
         return cache.values();
     }
 
+    public <T extends Storable> List<T> getCached(Class<T> clazz) {
+        return cache.values().stream().filter(storable -> clazz.isAssignableFrom(storable.getClass())).map(clazz::cast).collect(Collectors.toList());
+
+    }
     /**
      *
      * @return storables que não estão no cache, modificar-los não irá alterar nada
      */
     public <T extends Storable> List<T> getNonCached(Class<T> clazz){
         List<T> storables = dataSource.getAll(clazz);
-        storables.removeIf(storable -> cache.containsKey(storable.getName()));
+        storables.removeIf(storable -> cache.containsKey(storable.getKey()));
         return storables;
     }
 
@@ -55,7 +59,7 @@ public class DataManager{
      * @return storables offlines mais os que estão no cache
      */
     public <T extends Storable>  List<T> getAll(Class<T> clazz){
-        List<T> cached = getCached().stream().filter(storable -> clazz.isAssignableFrom(storable.getClass())).map(clazz::cast).collect(Collectors.toList());
+        List<T> cached = getCached(clazz);
         List<T> nonCached = getNonCached(clazz);
         return Stream.of(cached, nonCached).flatMap(Collection::stream).collect(Collectors.toList());
     }

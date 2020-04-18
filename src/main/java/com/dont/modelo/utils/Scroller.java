@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.dont.licensesystem.Terminal.AtlasPluginClassLoader.AtlasPlugin;
 import com.dont.modelo.Terminal;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,6 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -30,7 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Scroller {
 
     static {
-        JavaPlugin plugin = Terminal.getPlugin(Terminal.class);
+        AtlasPlugin plugin = Terminal.getPlugin(Terminal.class);
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onClick(InventoryClickEvent e) {

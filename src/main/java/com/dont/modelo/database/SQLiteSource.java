@@ -70,7 +70,7 @@ public class SQLiteSource implements IDataSource{
         Runnable runnable = () -> {
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT OR REPLACE INTO `"+tableName+"`(`key`, `json`) VALUES (?, ?)");
-                preparedStatement.setString(1, storable.getName());
+                preparedStatement.setString(1, storable.getKey());
                 preparedStatement.setString(2, gson.toJson(storable));
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
@@ -106,7 +106,9 @@ public class SQLiteSource implements IDataSource{
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 try {
-                    toReturn.add(gson.fromJson(resultSet.getString("json"), clazz));
+                    T storable = gson.fromJson(resultSet.getString("json"), clazz);
+                    if (storable == null || storable.getKey() == null) continue;
+                    toReturn.add(storable);
                 } catch (JsonSyntaxException e){
                     continue;
                 }

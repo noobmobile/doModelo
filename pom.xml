@@ -37,6 +37,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>license</groupId>
+            <artifactId>system</artifactId>
+            <version>1.8.8-R0.1</version>
+            <scope>system</scope>
+            <systemPath>C:/Users/Eduardo/Desktop/WorkSpace/_TestServer/plugins/AtlasLoader.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP-java9ea</artifactId>
             <version>2.6.1</version>
@@ -74,7 +81,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <outputFile>C:\Users\Eduardo\Desktop\WorkSpace\_TestServer\plugins\doModelo.jar</outputFile>
+                    <outputFile>C:\Users\Eduardo\Desktop\WorkSpace\_TestServer\plugins\AtlasLoader\doModelo.atlas</outputFile>
                 </configuration>
                 <executions>
                     <execution>

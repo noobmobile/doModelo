@@ -68,8 +68,8 @@ public class MongoSource implements IDataSource{
     @Override
     public void insert(Storable storable, boolean async) {
         Runnable runnable = () -> {
-            BasicDBObject object = new BasicDBObject().append("$set", new BasicDBObject("_id", storable.getName()).append("json", gson.toJson(storable)));
-            BasicDBObject query = new BasicDBObject().append("_id", storable.getName());
+            BasicDBObject object = new BasicDBObject().append("$set", new BasicDBObject("_id", storable.getKey()).append("json", gson.toJson(storable)));
+            BasicDBObject query = new BasicDBObject().append("_id", storable.getKey());
             mongoCollection.updateOne(query, object, UPSERT);
         };
         if (async) executor.submit(runnable);
@@ -92,8 +92,10 @@ public class MongoSource implements IDataSource{
         while (cursor.hasNext()){
             BasicDBObject dbObject = cursor.next();
             try {
-                toReturn.add(gson.fromJson(dbObject.getString("json"), clazz));
-            } catch (JsonSyntaxException e){
+                T storable = gson.fromJson(dbObject.getString("json"), clazz);
+                if (storable == null || storable.getKey() == null) continue;
+                toReturn.add(storable);
+            } catch (JsonSyntaxException e){ // por algum motivo, agora não é mais lançado essa exception e estou tendo que verificar manualmente
                 continue;
             }
         }

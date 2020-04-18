@@ -1,6 +1,8 @@
 package com.dont.modelo.utils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.dont.licensesystem.Terminal.AtlasPluginClassLoader.AtlasPlugin;
 import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,6 +23,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.authlib.GameProfile;
@@ -83,6 +87,27 @@ public class ItemComposer {
 		return this;
 	}
 
+	/**
+	 créditos a: https://github.com/TheMFjulio/MFLib/blob/master/src/main/java/com/mateus/mflib/util/ItemBuilder.java
+	 */
+	public ItemComposer setNBTTag(String key, String value) {
+		try {
+			Object nmsCopy = NMSReflect.getCraftBukkitClass("inventory", "CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+			Object nbtTagCompound = NMSReflect.getNMSClass("NBTTagCompound").getConstructor().newInstance();
+			boolean b = nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy) != null;
+			Object nbtTag = b ? nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy) : nbtTagCompound;
+			Constructor nbsString = NMSReflect.getNMSClass("NBTTagString").getConstructor(String.class);
+			nbtTag.getClass().getMethod("set", String.class, NMSReflect.getNMSClass("NBTBase"))
+					.invoke(nbtTag ,key, nbsString.newInstance(value));
+			nmsCopy.getClass().getMethod("setTag", NMSReflect.getNMSClass("NBTTagCompound")).invoke(nmsCopy, nbtTag);
+			this.item = (ItemStack) NMSReflect.getCraftBukkitClass("inventory", "CraftItemStack").getMethod("asBukkitCopy", NMSReflect.getNMSClass("ItemStack"))
+					.invoke(null,nmsCopy);
+		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
+			e.printStackTrace();
+		}
+		return this;
+	}
+	
 	public ItemComposer composeMeta(Consumer<ItemMeta> consumer) {
 		ItemMeta meta = item.getItemMeta();
 		consumer.accept(meta);
@@ -159,7 +184,7 @@ public class ItemComposer {
 		return this;
 	}
 
-	public ItemComposer setClickListener(JavaPlugin plugin, Consumer<PlayerInteractEvent> consumer) {
+	public ItemComposer setClickListener(AtlasPlugin plugin, Consumer<PlayerInteractEvent> consumer) {
 		Bukkit.getPluginManager().registerEvents(new Listener() {
 			@EventHandler
 			public void onInteract(PlayerInteractEvent e) {
@@ -169,6 +194,23 @@ public class ItemComposer {
 			}
 		}, plugin);
 		return this;
+	}
+
+	/**
+	 créditos a: https://github.com/TheMFjulio/MFLib/blob/master/src/main/java/com/mateus/mflib/util/NBTGetter.java
+	 */
+	public static String getNBTTag(ItemStack item, String key){
+		if (item == null || item.getType() == Material.AIR) return null;
+		try {
+			Object nmsCopy = NMSReflect.getCraftBukkitClass("inventory", "CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null,item);
+			if (nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy) != null) {
+				Object tagCompound = nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy);
+				return (String) tagCompound.getClass().getMethod("getString", String.class).invoke(tagCompound, key);
+			}
+		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public ItemStack toItemStack() {
