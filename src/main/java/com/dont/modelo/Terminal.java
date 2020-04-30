@@ -3,27 +3,32 @@ package com.dont.modelo;
 import com.dont.licensesystem.Terminal.AtlasPluginClassLoader.AtlasPlugin;
 import com.dont.modelo.bukkit.PlayerJoinQuit;
 import com.dont.modelo.config.Settings;
-import com.dont.modelo.database.*;
+import com.dont.modelo.database.AutoSave;
+import com.dont.modelo.database.DataManager;
+import com.dont.modelo.database.datasources.*;
 import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class Terminal extends AtlasPlugin {
 
     private Economy economy;
     private IDataSource dataSource;
     private DataManager dataManager;
+
     @Override
     public void onStartup() {
         saveDefaultConfig();
         Utils.debug(Utils.LogType.INFO, "Plugin iniciado, by don't");
         Utils.DEBUGGING = getConfig().getBoolean("Database.Debug");
-        if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MONGODB")) dataSource = new MongoSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
-        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL_POOLING")) dataSource = new MySQLPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
-        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL_PURO")) dataSource = new MySQLNoPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"),getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+        if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MONGODB"))
+            dataSource = new MongoSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL_POOLING"))
+            dataSource = new MySQLPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+        else if (getConfig().getString("Database.Tipo").equalsIgnoreCase("MYSQL_PURO"))
+            dataSource = new MySQLNoPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
         else dataSource = new SQLiteSource();
         if (dataSource == null || dataSource.isClosed()) return;
         dataManager = new DataManager(dataSource);
@@ -38,7 +43,7 @@ public class Terminal extends AtlasPlugin {
         dataSource.close();
     }
 
-    private void setup(){
+    private void setup() {
         Settings.setup(this);
         if (!setupEconomy()) {
             Bukkit.getConsoleSender().sendMessage("§eVault não encontrado");
@@ -47,15 +52,15 @@ public class Terminal extends AtlasPlugin {
         }
         dataManager.deleteOldUsers();
         Bukkit.getOnlinePlayers().forEach(player -> {
-            if (dataSource.exists(player.getName())){
+            if (dataSource.exists(player.getName())) {
                 User user = dataSource.find(player.getName(), User.class);
                 user.setLastActivity(System.currentTimeMillis());
                 dataManager.cache(user);
-                Utils.debug(Utils.LogType.DEBUG, "puxando player "+player.getName()+" da tabela");
+                Utils.debug(Utils.LogType.DEBUG, "puxando player " + player.getName() + " da tabela");
             } else {
                 User user = new User(player.getName());
                 dataManager.cache(user);
-                Utils.debug(Utils.LogType.DEBUG, "criando player "+player.getName()+" na tabela");
+                Utils.debug(Utils.LogType.DEBUG, "criando player " + player.getName() + " na tabela");
             }
         });
         new AutoSave(this);
@@ -68,6 +73,10 @@ public class Terminal extends AtlasPlugin {
             economy = economyProvider.getProvider();
         }
         return (economy != null);
+    }
+
+    public void reloadSettings() {
+        Settings.setup(this);
     }
 
     public Economy getEconomy() {
