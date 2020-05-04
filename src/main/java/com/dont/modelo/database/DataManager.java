@@ -2,8 +2,6 @@ package com.dont.modelo.database;
 
 import com.dont.modelo.database.datasources.IDataSource;
 import com.dont.modelo.models.database.Storable;
-import com.dont.modelo.models.database.User;
-import com.dont.modelo.utils.Utils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,20 +64,6 @@ public class DataManager {
 
     public IDataSource getDataSource() {
         return dataSource;
-    }
-
-    public void deleteOldUsers() {
-        Utils.measureTime("deletado usuarios em <tempo>ms", () -> {
-            int deletado = 0;
-            for (User user : getNonCached(User.class)) {
-                if (user.canBeDeleted()) {
-                    Utils.debug(Utils.LogType.DEBUG, "deletado " + user.getName() + "");
-                    dataSource.delete(user.getName(), true);
-                    deletado++;
-                }
-            }
-            Utils.debug(Utils.LogType.DEBUG, "deletado " + deletado + " usuarios");
-        });
     }
 
 }

@@ -3,10 +3,10 @@ package com.dont.modelo.utils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.apache.commons.codec.binary.Base64;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,8 +25,11 @@ public class SectionBuilder<T> {
         CLASS_ADAPTERS.put(ItemStack.class, new ItemAdapter());
         CLASS_ADAPTERS.put(String.class, new StringAdapter());
         CLASS_ADAPTERS.put(Material.class, new MaterialAdapter());
+        CLASS_ADAPTERS.put(Location.class, new LocationAdapter());
         CLASS_ADAPTERS.put(StringList.class, new ListAdapter<>(new StringAdapter()));
         CLASS_ADAPTERS.put(ItemList.class, new ListAdapter<>(new ItemAdapter()));
+        CLASS_ADAPTERS.put(Sound.class, object -> Sound.valueOf(((String) object).toUpperCase()));
+        CLASS_ADAPTERS.put(EntityType.class, object -> EntityType.valueOf(((String) object).toUpperCase()));
     }
 
     private final ConfigurationSection mainSection;
@@ -125,10 +128,9 @@ public class SectionBuilder<T> {
             Map<Enchantment, Integer> enchants = !section.isSet("Enchants") ? null : section.getStringList("Enchants").stream().map(string -> string.split(":")).collect(Collectors.toMap(array -> Enchantment.getByName(array[0]), array -> Integer.parseInt(array[1].trim())));
             boolean glow = section.isSet("Glow") && section.getBoolean("Glow");
 
-            ItemStack itemStack = new ItemStack(material, amount, (byte) data);
+            ItemStack itemStack = url == null ? new ItemStack(material, amount, (byte) data) : getCustomHead(url);
             ItemMeta itemMeta = itemStack.getItemMeta();
 
-            if (url != null) itemStack = getCustomHead(url);
             if (name != null) itemMeta.setDisplayName(name);
             if (lore != null) itemMeta.setLore(lore);
             if (glow) {
@@ -212,6 +214,23 @@ public class SectionBuilder<T> {
                 List<Object> list = (List<Object>) object;
                 return list.stream().map(adapter::supply).collect(Collectors.toList());
             }
+        }
+    }
+
+    public static class LocationAdapter implements Adapter<Location> {
+
+        @Override
+        public Location supply(Object object) {
+            String value = (String) object;
+            if (!value.contains(";")) return null;
+            String[] parts = value.split(";");
+            double x = Double.parseDouble(parts[0]);
+            double y = Double.parseDouble(parts[1]);
+            double z = Double.parseDouble(parts[2]);
+            float yaw = Float.parseFloat(parts[3]);
+            float pitch = Float.parseFloat(parts[4]);
+            World w = Bukkit.getServer().getWorld(parts[5]);
+            return new Location(w, x, y, z, yaw, pitch);
         }
     }
 

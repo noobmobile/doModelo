@@ -14,10 +14,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 public class Utils {
 
@@ -173,16 +170,17 @@ public class Utils {
     });
     private final static SectionBuilder.ListAdapter<CommandableItem> COMMANDABLE_ITEM_LIST_ADAPTER = new SectionBuilder.ListAdapter<>(object -> {
         ConfigurationSection section = (ConfigurationSection) object;
-        List<String> commands = section.getStringList("Comandos");
+        List<String> commands = !section.isSet("Comandos") ? new ArrayList<>() : section.getStringList("Comandos");
         ItemStack itemStack = ITEM_ADAPTER.supply(section);
         return new CommandableItem(itemStack, commands);
     });
     private final static SectionBuilder.ListAdapter<ConfigurableItem> CONFIGURABLE_ITEM_LIST_ADAPTER = new SectionBuilder.ListAdapter<>(object -> {
         ConfigurationSection section = (ConfigurationSection) object;
+        String key = section.getParent().getParent().getName() + "." + section.getName();
         double chance = section.getDouble("Chance");
-        List<String> commands = section.getStringList("Comandos");
+        List<String> commands = !section.isSet("Comandos") ? new ArrayList<>() : section.getStringList("Comandos");
         ItemStack itemStack = ITEM_ADAPTER.supply(section);
-        return new ConfigurableItem(itemStack, chance, commands);
+        return new ConfigurableItem(key, itemStack, chance, commands);
     });
 
     public static List<ItemStack> getItemsByConfigurationSection(ConfigurationSection section) {
@@ -274,7 +272,11 @@ public class Utils {
 
         @Override
         public void execute(Player player) {
-            getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("$player", player.getName())));
+            if (commands == null || commands.isEmpty()) {
+                player.getInventory().addItem(item);
+            } else {
+                getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("$player", player.getName())));
+            }
         }
 
         public List<String> getCommands() {
@@ -285,11 +287,13 @@ public class Utils {
 
     public static class ConfigurableItem implements Commandable, Chanceable, Item {
 
+        private String key;
         private ItemStack item;
         private double chance;
         private List<String> commands;
 
-        public ConfigurableItem(ItemStack item, double chance, List<String> commands) {
+        public ConfigurableItem(String key, ItemStack item, double chance, List<String> commands) {
+            this.key = key;
             this.item = item;
             this.chance = chance;
             this.commands = commands;
@@ -311,7 +315,11 @@ public class Utils {
 
         @Override
         public void execute(Player player) {
-            getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("$player", player.getName())));
+            if (commands == null || commands.isEmpty()) {
+                player.getInventory().addItem(item);
+            } else {
+                getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("$player", player.getName())));
+            }
         }
     }
 
