@@ -50,11 +50,9 @@ public class Terminal extends AtlasPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-        dataManager.deleteOldUsers();
         Bukkit.getOnlinePlayers().forEach(player -> {
             if (dataSource.exists(player.getName())) {
                 User user = dataSource.find(player.getName(), User.class);
-                user.setLastActivity(System.currentTimeMillis());
                 dataManager.cache(user);
                 Utils.debug(Utils.LogType.DEBUG, "puxando player " + player.getName() + " da tabela");
             } else {

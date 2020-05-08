@@ -1,10 +1,34 @@
 package com.dont.modelo.database.datasources;
 
+import com.dont.modelo.database.adapters.ItemStackAdapter;
+import com.dont.modelo.database.adapters.LocationAdapter;
 import com.dont.modelo.models.database.Storable;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public interface IDataSource {
+
+    public default ExecutorService getExecutorService() {
+        return Executors.newFixedThreadPool(3);
+    }
+
+    public default Gson getGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.enableComplexMapKeySerialization();
+        gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
+        gsonBuilder.registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter());
+        return gsonBuilder.create();
+    }
+
+    public default String getTableName() {
+        return "dont.modelo";
+    }
 
     /**
      * @param key   key que esteja a procurar
@@ -32,4 +56,5 @@ public interface IDataSource {
     public void close();
 
     public boolean isClosed();
+
 }

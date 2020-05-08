@@ -1,18 +1,13 @@
 package com.dont.modelo.database.datasources;
 
 import com.dont.modelo.Terminal;
-import com.dont.modelo.database.adapters.ItemStackAdapter;
-import com.dont.modelo.database.adapters.LocationAdapter;
 import com.dont.modelo.models.database.Storable;
 import com.dont.modelo.utils.Utils;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,23 +16,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 public class MySQLPoolingSource implements IDataSource {
 
-    private final String tableName = "dont.modelo";
+    private final String tableName = getTableName();
     private HikariDataSource dataSource;
     private final Gson gson;
     private final ExecutorService executor;
 
     public MySQLPoolingSource(String ip, String database, String user, String password) {
-        this.executor = Executors.newFixedThreadPool(3);
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.enableComplexMapKeySerialization();
-        gsonBuilder.registerTypeAdapter(Location.class, new LocationAdapter());
-        gsonBuilder.registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter());
-        this.gson = gsonBuilder.create();
+        this.executor = getExecutorService();
+        this.gson = getGson();
 
         String url = "jdbc:mysql://" + ip + "/" + database + "?autoReconnect=true";
         HikariConfig hikariConfig = new HikariConfig();
