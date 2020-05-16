@@ -28,8 +28,8 @@ public class SectionBuilder<T> {
         CLASS_ADAPTERS.put(Location.class, new LocationAdapter());
         CLASS_ADAPTERS.put(StringList.class, new ListAdapter<>(new StringAdapter()));
         CLASS_ADAPTERS.put(ItemList.class, new ListAdapter<>(new ItemAdapter()));
-        CLASS_ADAPTERS.put(Sound.class, object -> Sound.valueOf(((String) object).toUpperCase()));
-        CLASS_ADAPTERS.put(EntityType.class, object -> EntityType.valueOf(((String) object).toUpperCase()));
+        CLASS_ADAPTERS.put(Sound.class, new EnumAdapter<>(Sound.class));
+        CLASS_ADAPTERS.put(EntityType.class, new EnumAdapter<>(EntityType.class));
     }
 
     private final ConfigurationSection mainSection;
@@ -231,6 +231,20 @@ public class SectionBuilder<T> {
             float pitch = Float.parseFloat(parts[4]);
             World w = Bukkit.getServer().getWorld(parts[5]);
             return new Location(w, x, y, z, yaw, pitch);
+        }
+    }
+
+    public static class EnumAdapter<A extends Enum<A>> implements Adapter<A> {
+
+        private final Class<A> enumClass;
+
+        public EnumAdapter(Class<A> aEnum) {
+            this.enumClass = aEnum;
+        }
+
+        @Override
+        public A supply(Object object) {
+            return Enum.valueOf(enumClass, (String) object);
         }
     }
 

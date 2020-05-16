@@ -2,7 +2,7 @@ package com.dont.modelo;
 
 import com.dont.licensesystem.Terminal.AtlasPluginClassLoader.AtlasPlugin;
 import com.dont.modelo.bukkit.PlayerJoinQuit;
-import com.dont.modelo.config.Settings;
+import com.dont.modelo.config.ConfigManager;
 import com.dont.modelo.database.AutoSave;
 import com.dont.modelo.database.DataManager;
 import com.dont.modelo.database.datasources.*;
@@ -17,6 +17,7 @@ public class Terminal extends AtlasPlugin {
     private Economy economy;
     private IDataSource dataSource;
     private DataManager dataManager;
+    private ConfigManager configManager;
 
     @Override
     public void onStartup() {
@@ -44,7 +45,7 @@ public class Terminal extends AtlasPlugin {
     }
 
     private void setup() {
-        Settings.setup(this);
+        this.configManager = new ConfigManager(this);
         if (!setupEconomy()) {
             Bukkit.getConsoleSender().sendMessage("§eVault não encontrado");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -73,8 +74,12 @@ public class Terminal extends AtlasPlugin {
         return (economy != null);
     }
 
-    public void reloadSettings() {
-        Settings.setup(this);
+    public void reloadConfigManager() {
+        this.configManager = new ConfigManager(this);
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 
     public Economy getEconomy() {
