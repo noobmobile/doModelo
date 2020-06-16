@@ -1,14 +1,5 @@
 package com.dont.modelo.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
-import com.dont.licensesystem.Terminal.AtlasPluginClassLoader.AtlasPlugin;
 import com.dont.modelo.Terminal;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,8 +13,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * author: don't version: 2.0
@@ -32,7 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Scroller {
 
     static {
-        AtlasPlugin plugin = Terminal.getPlugin(Terminal.class);
+        JavaPlugin plugin = Terminal.getPlugin(Terminal.class);
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onClick(InventoryClickEvent e) {
@@ -222,14 +216,16 @@ public class Scroller {
             this.name = "";
             this.size = 45;
             this.items = new ArrayList<>();
-            this.onChooseItem = (player, item) -> { };
+            this.onChooseItem = (player, item) -> {
+            };
             this.nextPageSlot = 26;
             this.previousPageSlot = 18;
             this.customItems = new HashMap<>();
             this.customItemActions = new HashMap<>();
             this.allowedSlots = ALLOWED_SLOTS;
             this.backSlot = -1;
-            this.backConsumer = player -> { };
+            this.backConsumer = player -> {
+            };
             this.backItem = getBackFlecha();
             this.nextPageItem = getPageFlecha();
             this.previousPageItem = getPageFlecha();

@@ -37,13 +37,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>license</groupId>
-            <artifactId>system</artifactId>
-            <version>1.8.8-R0.1</version>
-            <scope>system</scope>
-            <systemPath>C:/Users/Eduardo/Desktop/WorkSpace/_TestServer/plugins/AtlasLoader.jar</systemPath>
-        </dependency>
-        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP-java9ea</artifactId>
             <version>2.6.1</version>
@@ -71,7 +64,8 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
             <version>3.11.1</version>
-            <scope>provided</scope> <!-->devido ao driver do mongodb ser muito pesado (2mb), por padrão deixar provided, e quando um cliente pedir para ter mongo, deixar compile</!-->
+            <scope>provided
+            </scope> <!-->devido ao driver do mongodb ser muito pesado (2mb), por padrão deixar provided, e quando um cliente pedir para ter mongo, deixar compile</!-->
         </dependency>
     </dependencies>
     <build>
@@ -81,7 +75,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <outputFile>C:\Users\Eduardo\Desktop\WorkSpace\_TestServer\plugins\AtlasLoader\doModelo.atlas</outputFile>
+                    <outputFile>C:\Users\Eduardo\Desktop\WorkSpace\_TestServer\plugins\doModelo.jar</outputFile>
                 </configuration>
                 <executions>
                     <execution>

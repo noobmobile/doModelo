@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,20 +75,21 @@ public class SectionBuilder<T> {
         }
         List<T> toReturn = new ArrayList<>();
         for (String key : mainSection.getKeys(false)) {
+            ConfigurationSection section = mainSection.getConfigurationSection(key);
+            List<Object> constructorParameters = new ArrayList<>();
+            constructorParameters.add(key);
+            for (Map.Entry<String, Class<?>> entry : parameters.entrySet()) {
+                String parameter = entry.getKey();
+                Class<?> parameterClass = entry.getValue();
+                Object object = section.get(parameter);
+                Adapter<?> adapter = parametersAdapters.getOrDefault(parameter, CLASS_ADAPTERS.get(parameterClass));
+                constructorParameters.add(adapter == null ? object : adapter.supply(object));
+            }
             try {
-                ConfigurationSection section = mainSection.getConfigurationSection(key);
-                List<Object> constructorParameters = new ArrayList<>();
-                constructorParameters.add(key);
-                for (Map.Entry<String, Class<?>> entry : parameters.entrySet()) {
-                    String parameter = entry.getKey();
-                    Class<?> parameterClass = entry.getValue();
-                    Object object = section.get(parameter);
-                    Adapter<?> adapter = parametersAdapters.getOrDefault(parameter, CLASS_ADAPTERS.get(parameterClass));
-                    constructorParameters.add(adapter == null ? object : adapter.supply(object));
-                }
                 T instance = constructor.newInstance(constructorParameters.toArray());
                 toReturn.add(instance);
-            } catch (Exception e) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                System.out.println("Erro na config em: " + mainSection.getName() + "." + key);
                 e.printStackTrace();
             }
         }

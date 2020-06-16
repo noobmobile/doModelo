@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -34,6 +35,24 @@ public class Utils {
     public static void debug(LogType type, String mensagem) {
         if (type == LogType.DEBUG && !DEBUGGING) return;
         Bukkit.getConsoleSender().sendMessage("[" + type.name() + "] " + prefix + mensagem);
+    }
+
+    public static void async(Runnable runnable) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                runnable.run();
+            }
+        }.runTaskAsynchronously(main);
+    }
+
+    public static void sync(Runnable runnable) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                runnable.run();
+            }
+        }.runTask(main);
     }
 
 

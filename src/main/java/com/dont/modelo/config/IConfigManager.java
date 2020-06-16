@@ -2,6 +2,7 @@ package com.dont.modelo.config;
 
 import com.dont.modelo.Terminal;
 import com.dont.modelo.utils.SectionBuilder;
+import com.dont.modelo.utils.Validator;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -21,6 +22,7 @@ public abstract class IConfigManager {
 
     public IConfigManager(Terminal main) {
         this.main = main;
+        new Validator(main);
     }
 
     protected <T> T get(String path) {
