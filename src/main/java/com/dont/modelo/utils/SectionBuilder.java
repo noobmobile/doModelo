@@ -16,6 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SectionBuilder<T> {
@@ -94,6 +95,10 @@ public class SectionBuilder<T> {
             }
         }
         return toReturn;
+    }
+
+    public <E> Map<E, T> build(Function<T, E> extractor) {
+        return build().stream().collect(Collectors.toMap(extractor, Function.identity()));
     }
 
     public static interface Adapter<A> {
