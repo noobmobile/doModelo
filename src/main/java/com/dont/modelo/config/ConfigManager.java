@@ -1,10 +1,10 @@
 package com.dont.modelo.config;
 
-import com.dont.modelo.Terminal;
+import com.dont.modelo.models.AbstractTerminal;
 
 public class ConfigManager extends IConfigManager {
 
-    public ConfigManager(Terminal main) {
+    public ConfigManager(AbstractTerminal main) {
         super(main);
     }
 }

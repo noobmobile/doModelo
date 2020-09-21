@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 public class Scroller {
 
     static {
-        JavaPlugin plugin = Terminal.getPlugin(Terminal.class);
+        JavaPlugin plugin = Terminal.getInstance();
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onClick(InventoryClickEvent e) {

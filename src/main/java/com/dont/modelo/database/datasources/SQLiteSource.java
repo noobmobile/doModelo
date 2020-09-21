@@ -26,12 +26,12 @@ public class SQLiteSource implements IDataSource {
 
         try {
             Class.forName("org.sqlite.JDBC");
-            this.connection = DriverManager.getConnection("jdbc:sqlite:" + Terminal.getPlugin(Terminal.class).getDataFolder().getPath() + "/database.db");
+            this.connection = DriverManager.getConnection("jdbc:sqlite:" + Terminal.getInstance().getDataFolder().getPath() + "/database.db");
             createTables();
             Utils.debug(Utils.LogType.INFO, "conexao com sqlite estabelecida");
         } catch (Exception e) {
             System.out.println("nao foi possivel conexao com sqlite: " + e.getMessage());
-            Bukkit.getPluginManager().disablePlugin(Terminal.getPlugin(Terminal.class));
+            Bukkit.getPluginManager().disablePlugin(Terminal.getInstance());
         }
 
     }

@@ -1,8 +1,7 @@
 package com.dont.modelo.config;
 
-import com.dont.modelo.Terminal;
+import com.dont.modelo.models.AbstractTerminal;
 import com.dont.modelo.utils.SectionBuilder;
-import com.dont.modelo.utils.Validator;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -14,15 +13,14 @@ import java.util.stream.Collectors;
 
 public abstract class IConfigManager {
 
-    protected Terminal main;
+    protected AbstractTerminal main;
     protected final SectionBuilder.Adapter<ItemStack> ITEM_ADAPTER = new SectionBuilder.ItemAdapter();
     protected final SectionBuilder.Adapter<Location> LOCATION_ADAPTER = new SectionBuilder.LocationAdapter();
     protected final SectionBuilder.Adapter<Sound> SOUND_ADAPTER = new SectionBuilder.EnumAdapter<>(Sound.class);
     protected final SectionBuilder.Adapter<EntityType> ENTITY_ADAPTER = new SectionBuilder.EnumAdapter<>(EntityType.class);
 
-    public IConfigManager(Terminal main) {
+    public IConfigManager(AbstractTerminal main) {
         this.main = main;
-        new Validator(main);
     }
 
     protected <T> T get(String path) {

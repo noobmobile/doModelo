@@ -39,7 +39,7 @@ public class MongoSource implements IDataSource {
             Utils.debug(Utils.LogType.INFO, "conexao com mongodb estabelecida");
         } catch (Exception e) {
             System.out.println("nao foi possivel conexao com mysql: " + e.getMessage());
-            Bukkit.getPluginManager().disablePlugin(Terminal.getPlugin(Terminal.class));
+            Bukkit.getPluginManager().disablePlugin(Terminal.getInstance());
             if (mongoClient != null) {
                 mongoClient.close();
                 mongoClient = null;

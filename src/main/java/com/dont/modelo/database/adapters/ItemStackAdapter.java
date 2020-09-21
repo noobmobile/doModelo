@@ -1,7 +1,7 @@
 package com.dont.modelo.database.adapters;
 
 
-import com.dont.modelo.utils.Utils;
+import com.dont.modelo.utils.Serializer;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -13,7 +13,7 @@ public class ItemStackAdapter extends TypeAdapter<ItemStack> {
     @Override//
     public void write(JsonWriter out, ItemStack item) throws IOException {
         out.beginObject();
-        out.name("item").value(Utils.toBase64(item));
+        out.name("item").value(Serializer.serializeItem(item));
         out.endObject();
     }
 
@@ -24,7 +24,7 @@ public class ItemStackAdapter extends TypeAdapter<ItemStack> {
         ItemStack item = null;
         while (in.hasNext()) {
             if (in.nextName().equalsIgnoreCase("item")) {
-                item = Utils.fromBase64(in.nextString());
+                item = Serializer.deserializeItem(in.nextString());
             }
         }
 

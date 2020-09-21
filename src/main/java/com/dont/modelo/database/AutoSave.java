@@ -1,16 +1,17 @@
 package com.dont.modelo.database;
 
-import com.dont.modelo.Terminal;
+import com.dont.modelo.models.AbstractTerminal;
 import com.dont.modelo.models.database.Storable;
 import com.dont.modelo.utils.Utils;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class AutoSave extends BukkitRunnable {
 
-    private final Terminal main;
-    public AutoSave(Terminal main) {
+    private final AbstractTerminal main;
+
+    public AutoSave(AbstractTerminal main) {
         this.main = main;
-        runTaskTimerAsynchronously(main, 20l*60*30, 20l*60*30);
+        runTaskTimerAsynchronously(main, 20L * 60 * 30, 20L * 60 * 30);
     }
 
     @Override
@@ -18,13 +19,13 @@ public class AutoSave extends BukkitRunnable {
         Utils.debug(Utils.LogType.DEBUG, "Iniciando auto save");
         long before = System.currentTimeMillis();
         int i = 0;
-        for (Storable storable : main.getDataManager().getCached()) {
-            main.getDataManager().getDataSource().insert(storable, false); // não precisa ser em async já que já é em async
+        for (Storable storable : main.getManager(DataManager.class).getCached()) {
+            main.getManager(DataManager.class).getDataSource().insert(storable, false); // não precisa ser em async já que já é em async
             i++;
         }
         long now = System.currentTimeMillis();
-        long total = now-before;
-        Utils.debug(Utils.LogType.INFO, "Auto completo, salvo "+i+" objetos em "+total+"ms");
+        long total = now - before;
+        Utils.debug(Utils.LogType.INFO, "Auto completo, salvo " + i + " objetos em " + total + "ms");
     }
 
 }

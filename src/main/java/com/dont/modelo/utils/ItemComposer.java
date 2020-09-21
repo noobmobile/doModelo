@@ -90,15 +90,15 @@ public class ItemComposer {
      */
     public ItemComposer setNBTTag(String key, String value) {
         try {
-            Object nmsCopy = NMSReflect.getCraftBukkitClass("inventory", "CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-            Object nbtTagCompound = NMSReflect.getNMSClass("NBTTagCompound").getConstructor().newInstance();
+            Object nmsCopy = Reflections.getCBClass("inventory", "CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+            Object nbtTagCompound = Reflections.getNMSClass("NBTTagCompound").getConstructor().newInstance();
             boolean b = nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy) != null;
             Object nbtTag = b ? nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy) : nbtTagCompound;
-            Constructor nbsString = NMSReflect.getNMSClass("NBTTagString").getConstructor(String.class);
-            nbtTag.getClass().getMethod("set", String.class, NMSReflect.getNMSClass("NBTBase"))
+            Constructor nbsString = Reflections.getNMSClass("NBTTagString").getConstructor(String.class);
+            nbtTag.getClass().getMethod("set", String.class, Reflections.getNMSClass("NBTBase"))
                     .invoke(nbtTag, key, nbsString.newInstance(value));
-            nmsCopy.getClass().getMethod("setTag", NMSReflect.getNMSClass("NBTTagCompound")).invoke(nmsCopy, nbtTag);
-            this.item = (ItemStack) NMSReflect.getCraftBukkitClass("inventory", "CraftItemStack").getMethod("asBukkitCopy", NMSReflect.getNMSClass("ItemStack"))
+            nmsCopy.getClass().getMethod("setTag", Reflections.getNMSClass("NBTTagCompound")).invoke(nmsCopy, nbtTag);
+            this.item = (ItemStack) Reflections.getCBClass("inventory", "CraftItemStack").getMethod("asBukkitCopy", Reflections.getNMSClass("ItemStack"))
                     .invoke(null, nmsCopy);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
             e.printStackTrace();
@@ -200,7 +200,7 @@ public class ItemComposer {
     public static String getNBTTag(ItemStack item, String key) {
         if (item == null || item.getType() == Material.AIR) return null;
         try {
-            Object nmsCopy = NMSReflect.getCraftBukkitClass("inventory", "CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+            Object nmsCopy = Reflections.getCBClass("inventory", "CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
             if (nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy) != null) {
                 Object tagCompound = nmsCopy.getClass().getMethod("getTag").invoke(nmsCopy);
                 return (String) tagCompound.getClass().getMethod("getString", String.class).invoke(tagCompound, key);

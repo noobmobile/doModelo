@@ -12,7 +12,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -21,8 +23,13 @@ import java.util.function.Consumer;
  */
 public class InventoryHandler {
 
+    private static final List<Integer> ALLOWED = Arrays.asList(
+            10, 11, 12, 13, 14, 15, 16,
+            19, 20, 21, 22, 23, 24, 25,
+            28, 29, 30, 31, 32, 33, 34);
+
     static {
-        JavaPlugin main = Terminal.getPlugin(Terminal.class);
+        JavaPlugin main = Terminal.getInstance();
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onClick(InventoryClickEvent e) {
@@ -62,6 +69,24 @@ public class InventoryHandler {
     public InventoryHandler item(int slot, ItemStack item, Consumer<Player> consumer) {
         inventory.setItem(slot, item);
         customItems.put(slot, consumer);
+        return this;
+    }
+
+    public InventoryHandler items(List<ItemStack> items) {
+        items(items, ALLOWED);
+        return this;
+    }
+
+    private InventoryHandler items(List<ItemStack> items, List<Integer> allowed) {
+        int lastIndex = 0;
+        for (int i = 0; i < 54; i++) {
+            if (!allowed.contains(i))
+                continue;
+            if (lastIndex >= items.size())
+                break;
+            inventory.setItem(i, items.get(lastIndex));
+            lastIndex++;
+        }
         return this;
     }
 

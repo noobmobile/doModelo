@@ -23,6 +23,15 @@ public class Time {
         return of(0L);
     }
 
+    public static String format(long millis) {
+        return Time.of(millis)
+                .day(i -> i + (i == 1 ? " dia" : " dias"))
+                .hour(i -> i + (i == 1 ? " hora" : " horas"))
+                .min(i -> i + (i == 1 ? " minuto" : " minutos"))
+                .sec(i -> i + (i == 1 ? " segundo" : " segundos"))
+                .and("e").get();
+    }
+
     public Time and(String and) {
         this.and = and;
         return this;

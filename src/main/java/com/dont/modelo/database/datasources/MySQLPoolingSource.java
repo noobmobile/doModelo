@@ -45,7 +45,7 @@ public class MySQLPoolingSource implements IDataSource {
             Utils.debug(Utils.LogType.INFO, "conexao com mysql estabelecida");
         } catch (Exception e) {
             System.out.println("nao foi possivel conexao com mysql: " + e.getMessage());
-            Bukkit.getPluginManager().disablePlugin(Terminal.getPlugin(Terminal.class));
+            Bukkit.getPluginManager().disablePlugin(Terminal.getInstance());
         }
 
     }
