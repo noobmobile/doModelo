@@ -4,6 +4,7 @@ import com.dont.modelo.Terminal;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,15 +20,6 @@ public class Utils {
     private static final Random RANDOM = new Random();
 
     public static boolean DEBUGGING = true;
-
-    public static void debug(LogType type, String message) {
-        if (type == LogType.DEBUG && !DEBUGGING) return;
-        Bukkit.getConsoleSender().sendMessage("[" + type.name() + "] " + PREFIX + message);
-    }
-
-    public enum LogType {
-        INFO, DEBUG;
-    }
 
     public static void async(Runnable runnable) {
         new BukkitRunnable() {
@@ -45,6 +37,14 @@ public class Utils {
                 runnable.run();
             }
         }.runTask(main);
+    }
+
+    public static void yes(Player player) {
+        player.playSound(player.getLocation(), Sound.ORB_PICKUP, 1, 1);
+    }
+
+    public static void no(Player player) {
+        player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1, 1);
     }
 
     public static void measureTime(Supplier<String> runnable) {
@@ -71,6 +71,15 @@ public class Utils {
 
     public static void removeItemFromHand(Player player) {
         removeItemFromHand(player, 1);
+    }
+
+    public static void debug(LogType type, String message) {
+        if (type == LogType.DEBUG && !DEBUGGING) return;
+        Bukkit.getConsoleSender().sendMessage("[" + type.name() + "] " + PREFIX + message);
+    }
+
+    public enum LogType {
+        INFO, DEBUG;
     }
 
 }

@@ -1,7 +1,7 @@
 package com.dont.modelo.models.bukkit;
 
+import com.dont.modelo.Terminal;
 import com.dont.modelo.database.DataManager;
-import com.dont.modelo.models.AbstractTerminal;
 import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
 import org.bukkit.Bukkit;
@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 public abstract class DoCommand implements CommandExecutor {
 
-    protected final AbstractTerminal main;
+    protected final Terminal main;
     protected final DataManager manager;
 
-    public DoCommand(AbstractTerminal main, String command) {
+    public DoCommand(Terminal main, String command) {
         this.main = main;
         this.manager = main.getManager(DataManager.class);
         main.getCommand(command).setExecutor(this);

@@ -13,7 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 public class Scroller {
 
     static {
-        JavaPlugin plugin = Terminal.getInstance();
+        Plugin plugin = Terminal.getInstance();
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onClick(InventoryClickEvent e) {

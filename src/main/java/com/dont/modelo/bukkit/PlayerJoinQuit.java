@@ -1,6 +1,6 @@
 package com.dont.modelo.bukkit;
 
-import com.dont.modelo.models.AbstractTerminal;
+import com.dont.modelo.Terminal;
 import com.dont.modelo.models.bukkit.DoListener;
 import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerJoinQuit extends DoListener {
-    public PlayerJoinQuit(AbstractTerminal main) {
+    public PlayerJoinQuit(Terminal main) {
         super(main);
     }
 

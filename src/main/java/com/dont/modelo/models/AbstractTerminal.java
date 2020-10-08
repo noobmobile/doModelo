@@ -1,6 +1,5 @@
 package com.dont.modelo.models;
 
-import com.dont.modelo.bukkit.PlayerJoinQuit;
 import com.dont.modelo.config.ConfigManager;
 import com.dont.modelo.database.AutoSave;
 import com.dont.modelo.database.DataManager;
@@ -40,8 +39,11 @@ public abstract class AbstractTerminal extends JavaPlugin {
     @Override
     public void onDisable() {
         Utils.debug(Utils.LogType.INFO, "Plugin desligado");
+        disable();
         saveAll();
     }
+
+    protected abstract void disable();
 
     private void setup() {
         if (dataSource == null || dataSource.isClosed()) return;
@@ -54,7 +56,6 @@ public abstract class AbstractTerminal extends JavaPlugin {
         }
         loadOnlinePlayers();
         new AutoSave(this);
-        new PlayerJoinQuit(this);
         posSetup();
     }
 
@@ -87,6 +88,7 @@ public abstract class AbstractTerminal extends JavaPlugin {
     }
 
     private void loadOnlinePlayers() {
+        if (loaderTyper == null) return;
         loaderTyper.accept(getManager(DataManager.class));
     }
 

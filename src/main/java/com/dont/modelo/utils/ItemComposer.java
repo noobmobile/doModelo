@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -182,7 +182,7 @@ public class ItemComposer {
         return this;
     }
 
-    public ItemComposer setClickListener(JavaPlugin plugin, Consumer<PlayerInteractEvent> consumer) {
+    public ItemComposer setClickListener(Plugin plugin, Consumer<PlayerInteractEvent> consumer) {
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onInteract(PlayerInteractEvent e) {

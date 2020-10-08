@@ -10,7 +10,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class InventoryHandler {
             28, 29, 30, 31, 32, 33, 34);
 
     static {
-        JavaPlugin main = Terminal.getInstance();
+        Plugin main = Terminal.getInstance();
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onClick(InventoryClickEvent e) {
@@ -66,6 +66,16 @@ public class InventoryHandler {
         return this;
     }
 
+    public InventoryHandler item(int slot, Items.MenuItem item) {
+        inventory.setItem(slot, item.getItem());
+        return this;
+    }
+
+    public InventoryHandler item(Items.MenuItem menuItem) {
+        inventory.setItem(menuItem.getSlot(), menuItem.getItem());
+        return this;
+    }
+
     public InventoryHandler item(int slot, ItemStack item, Consumer<Player> consumer) {
         inventory.setItem(slot, item);
         customItems.put(slot, consumer);
@@ -77,9 +87,15 @@ public class InventoryHandler {
         return this;
     }
 
+    public InventoryHandler items(List<ItemStack> items, ItemStack orElse) {
+        if (items.isEmpty()) items.add(orElse);
+        items(items, ALLOWED);
+        return this;
+    }
+
     private InventoryHandler items(List<ItemStack> items, List<Integer> allowed) {
         int lastIndex = 0;
-        for (int i = 0; i < 54; i++) {
+        for (int i = 0; i < inventory.getSize(); i++) {
             if (!allowed.contains(i))
                 continue;
             if (lastIndex >= items.size())
