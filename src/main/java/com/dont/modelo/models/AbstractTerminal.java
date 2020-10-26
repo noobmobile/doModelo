@@ -2,8 +2,12 @@ package com.dont.modelo.models;
 
 import com.dont.modelo.config.ConfigManager;
 import com.dont.modelo.database.AutoSave;
-import com.dont.modelo.database.DataManager;
-import com.dont.modelo.database.datasources.*;
+import com.dont.modelo.database.MainDataManager;
+import com.dont.modelo.database.exceptions.DatabaseException;
+import com.dont.modelo.database.managers.EntityManager;
+import com.dont.modelo.database.managers.HikariEntityManager;
+import com.dont.modelo.database.managers.MySQLEntityManager;
+import com.dont.modelo.database.managers.SQLLiteEntityManager;
 import com.dont.modelo.utils.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -12,19 +16,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public abstract class AbstractTerminal extends JavaPlugin {
 
-    private final Consumer<DataManager> loaderTyper;
     private Economy economy;
-    private IDataSource dataSource;
     private ConfigManager configManager;
     private Map<Class<? extends Manager>, Manager> managers;
+    protected EntityManager entityManager;
+    private MainDataManager mainDataManager;
 
-    public AbstractTerminal(Consumer<DataManager> loaderType) {
-        this.loaderTyper = loaderType;
-    }
 
     @Override
     public void onEnable() {
@@ -32,7 +32,7 @@ public abstract class AbstractTerminal extends JavaPlugin {
         Utils.debug(Utils.LogType.INFO, "Plugin iniciado, by don't");
         Utils.DEBUGGING = getConfig().getBoolean("Database.Debug");
         this.managers = new HashMap<>();
-        prepareDatabase();
+        if (!prepareDatabase()) return;
         setup();
     }
 
@@ -46,7 +46,6 @@ public abstract class AbstractTerminal extends JavaPlugin {
     protected abstract void disable();
 
     private void setup() {
-        if (dataSource == null || dataSource.isClosed()) return;
         this.configManager = new ConfigManager(this);
         preSetup();
         if (!setupEconomy()) {
@@ -54,7 +53,6 @@ public abstract class AbstractTerminal extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-        loadOnlinePlayers();
         new AutoSave(this);
         posSetup();
     }
@@ -68,28 +66,37 @@ public abstract class AbstractTerminal extends JavaPlugin {
     }
 
     private void saveAll() {
-        if (dataSource == null) return;
-        getManager(DataManager.class).saveCached();
-        dataSource.close();
-    }
-
-    private void prepareDatabase() {
-        String databaseType = getConfig().getString("Database.Tipo");
-        if (databaseType.equalsIgnoreCase("MONGODB")) {
-            dataSource = new MongoSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
-        } else if (databaseType.equalsIgnoreCase("MYSQL_POOLING")) {
-            dataSource = new MySQLPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
-        } else if (databaseType.equalsIgnoreCase("MYSQL_PURO")) {
-            dataSource = new MySQLNoPoolingSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
-        } else {
-            dataSource = new SQLiteSource();
+        try {
+            if (entityManager == null) return;
+            mainDataManager.saveCached(false);
+            entityManager.close();
+        } catch (DatabaseException e) {
+            e.printStackTrace();
         }
-        registerManager(new DataManager(dataSource));
     }
 
-    private void loadOnlinePlayers() {
-        if (loaderTyper == null) return;
-        loaderTyper.accept(getManager(DataManager.class));
+    private boolean prepareDatabase() {
+        try {
+            String databaseType = getConfig().getString("Database.Tipo");
+            if (databaseType.equalsIgnoreCase("MYSQL_POOLING")) {
+                entityManager = new HikariEntityManager(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+            } else if (databaseType.equalsIgnoreCase("MYSQL_PURO")) {
+                entityManager = new MySQLEntityManager(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+            } else {
+                entityManager = new SQLLiteEntityManager();
+            }
+            this.mainDataManager = new MainDataManager(entityManager);
+            return true;
+        } catch (DatabaseException e) {
+            Utils.debug(Utils.LogType.INFO, "erro ao inicializar conexão com banco de dados");
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
+        return false;
+    }
+
+    public MainDataManager getDataManager() {
+        return mainDataManager;
     }
 
     public void reloadConfigManager() {

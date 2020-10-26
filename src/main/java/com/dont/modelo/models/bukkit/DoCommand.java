@@ -1,7 +1,7 @@
 package com.dont.modelo.models.bukkit;
 
 import com.dont.modelo.Terminal;
-import com.dont.modelo.database.DataManager;
+import com.dont.modelo.database.MainDataManager;
 import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
 import org.bukkit.Bukkit;
@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 public abstract class DoCommand implements CommandExecutor {
 
     protected final Terminal main;
-    protected final DataManager manager;
+    protected final MainDataManager manager;
 
     public DoCommand(Terminal main, String command) {
         this.main = main;
-        this.manager = main.getManager(DataManager.class);
+        this.manager = main.getDataManager();
         main.getCommand(command).setExecutor(this);
         Utils.debug(Utils.LogType.INFO, this.getClass().getSimpleName() + " carregado");
     }
@@ -113,7 +113,7 @@ public abstract class DoCommand implements CommandExecutor {
     }
 
     protected User parseUser(String user) {
-        return manager.get(user);
+        return manager.USERS.getCached(user);
     }
 
     protected User parseUser(Player user) {

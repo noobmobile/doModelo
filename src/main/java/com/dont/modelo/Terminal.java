@@ -1,13 +1,10 @@
 package com.dont.modelo;
 
 import com.dont.modelo.bukkit.PlayerJoinQuit;
-import com.dont.modelo.database.DataManager;
 import com.dont.modelo.models.AbstractTerminal;
+import com.dont.modelo.models.database.User;
 
 public class Terminal extends AbstractTerminal {
-    public Terminal() {
-        super(DataManager::loadOnline);
-    }
 
     @Override
     protected void preSetup() {
@@ -16,7 +13,7 @@ public class Terminal extends AbstractTerminal {
 
     @Override
     protected void posSetup() {
-
+        User.loadAll(getDataManager().USERS);
     }
 
     @Override

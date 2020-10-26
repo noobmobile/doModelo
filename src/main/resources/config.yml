@@ -1,5 +1,5 @@
 Database:
-  Tipo: SQLITE #Tipos válidos: MYSQL_POOLING, MYSQL_PURO, MONGODB, SQLITE
+  Tipo: SQLITE #Tipos válidos: MYSQL_POOLING, MYSQL_PURO, SQLITE
   IP: localhost:3306
   DB: test
   User: admin

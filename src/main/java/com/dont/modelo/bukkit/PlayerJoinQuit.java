@@ -18,25 +18,17 @@ public class PlayerJoinQuit extends DoListener {
     public void onJoin(PlayerJoinEvent e) {
         Utils.async(() -> {
             Player player = e.getPlayer();
-            if (manager.getDataSource().exists(player.getName())) {
-                User user = manager.getDataSource().find(player.getName(), User.class);
-                manager.cache(user);
-                Utils.debug(Utils.LogType.DEBUG, "puxando player " + player.getName() + " da tabela");
-            } else {
-                User user = new User(player.getName());
-                manager.cache(user);
-                Utils.debug(Utils.LogType.DEBUG, "criando player " + player.getName() + " na tabela");
-            }
+            User.load(player, main.getDataManager().USERS);
         });
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        if (!manager.isCached(player.getName())) return;
-        User user = manager.get(player.getName());
-        manager.getDataSource().insert(user, true);
-        manager.uncache(player.getName());
+        if (!manager.USERS.isCached(player.getName())) return;
+        User user = manager.USERS.getCached(player.getName());
+        manager.USERS.insert(player.getName(), user, true);
+        manager.USERS.uncache(player.getName());
         Utils.debug(Utils.LogType.DEBUG, "salvando player " + player.getName() + " na tabela");
     }
 
