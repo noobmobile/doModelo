@@ -16,6 +16,7 @@ public class Terminal extends AbstractTerminal {
 
     @Override
     protected void posSetup() {
+
     }
 
     @Override

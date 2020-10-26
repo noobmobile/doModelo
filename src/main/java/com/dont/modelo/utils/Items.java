@@ -4,6 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +58,12 @@ public class Items {
                 meta.setLore(meta.getLore().stream()
                         .map(lore -> replace(lore, placeholders))
                         .collect(Collectors.toList()));
+            }
+            if (meta instanceof SkullMeta) {
+                SkullMeta skullMeta = (SkullMeta) meta;
+                if (skullMeta.hasOwner()) {
+                    skullMeta.setOwner(replace(skullMeta.getOwner(), placeholders));
+                }
             }
         });
     }

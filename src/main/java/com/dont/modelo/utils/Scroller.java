@@ -311,6 +311,26 @@ public class Scroller {
             return this;
         }
 
+        public Builder withNextPageItem(Items.MenuItem nextPageItem) {
+            this.nextPageItem = nextPageItem.getItem();
+            this.nextPageSlot = nextPageItem.getSlot();
+            return this;
+        }
+
+        public Builder withPreviousPageItem(Items.MenuItem previousPageItem) {
+            this.previousPageItem = previousPageItem.getItem();
+            this.previousPageSlot = previousPageItem.getSlot();
+            return this;
+        }
+
+        public Builder withCustomItem(Items.MenuItem menuItem) {
+            return withCustomItem(menuItem.getSlot(), menuItem.getItem());
+        }
+
+        public Builder withCustomItem(Items.MenuItem menuItem, Consumer<Player> action) {
+            return withCustomItem(menuItem.getSlot(), menuItem.getItem(), action);
+        }
+
         public Builder withAllowedSlots(List<Integer> allowedSlots) {
             this.allowedSlots = allowedSlots;
             return this;
