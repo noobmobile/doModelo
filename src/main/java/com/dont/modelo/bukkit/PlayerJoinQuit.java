@@ -27,7 +27,7 @@ public class PlayerJoinQuit extends DoListener {
         Player player = e.getPlayer();
         if (!manager.USERS.isCached(player.getName())) return;
         User user = manager.USERS.getCached(player.getName());
-        manager.USERS.insert(player.getName(), user, true);
+        manager.USERS.insert(user, true);
         manager.USERS.uncache(player.getName());
         Utils.debug(Utils.LogType.DEBUG, "salvando player " + player.getName() + " na tabela");
     }

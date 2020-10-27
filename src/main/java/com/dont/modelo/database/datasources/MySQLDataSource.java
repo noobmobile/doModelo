@@ -1,49 +1,35 @@
-package com.dont.modelo.database.managers;
+package com.dont.modelo.database.datasources;
 
-import com.dont.modelo.database.dao.GenericDao;
+import com.dont.modelo.database.datamanagers.GenericDataManager;
 import com.dont.modelo.database.exceptions.DatabaseException;
 import com.dont.modelo.utils.Utils;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HikariEntityManager extends EntityManager {
+public class MySQLDataSource extends AbstractDataSource {
 
-    private HikariDataSource dataSource;
+    private Connection connection;
 
-    public HikariEntityManager(String ip, String database, String user, String password) throws DatabaseException {
+    public MySQLDataSource(String ip, String database, String user, String password) throws DatabaseException {
         openConnection(ip, database, user, password);
     }
 
     private void openConnection(String ip, String database, String user, String password) throws DatabaseException {
         try {
-
             String url = "jdbc:mysql://" + ip + "/" + database + "?autoReconnect=true";
-            HikariConfig hikariConfig = new HikariConfig();
-            hikariConfig.setJdbcUrl(url);
-            hikariConfig.setUsername(user);
-            hikariConfig.setPassword(password);
-            hikariConfig.setMaximumPoolSize(3);
-            hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-            hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-            hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            this.dataSource = new HikariDataSource(hikariConfig);
-            Utils.debug(Utils.LogType.INFO, "conexão com mysql hikari inicializada com sucesso");
+            this.connection = DriverManager.getConnection(url, user, password);
+            Utils.debug(Utils.LogType.INFO, "conexão com mysql inicializada com sucesso");
         } catch (Exception e) {
-            throw new DatabaseException("não foi possivel iniciar conexão com banco de dados hikari", e);
+            throw new DatabaseException("não foi possivel iniciar conexão com banco de dados mysql", e);
         }
     }
 
     @Override
     public <V> void insert(String key, V value, boolean async, String tableName) {
         Runnable runnable = () -> {
-            try (Connection connection = dataSource.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `" + tableName + "`(`key`, `json`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `json` = VALUES(`json`)")) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `" + tableName + "`(`key`, `json`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `json` = VALUES(`json`)")) {
                 preparedStatement.setString(1, key);
                 preparedStatement.setString(2, gson.toJson(value));
                 preparedStatement.executeUpdate();
@@ -59,8 +45,7 @@ public class HikariEntityManager extends EntityManager {
     @Override
     public void delete(String key, boolean async, String tableName) {
         Runnable runnable = () -> {
-            try (Connection connection = dataSource.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM `" + tableName + "` WHERE `key` = ?")) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM `" + tableName + "` WHERE `key` = ?")) {
                 preparedStatement.setString(1, key);
                 preparedStatement.executeUpdate();
             } catch (Exception e) {
@@ -74,8 +59,7 @@ public class HikariEntityManager extends EntityManager {
 
     @Override
     public <V> V find(String key, String tableName, Class<V> vClass) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + tableName + "` WHERE `key` = ?")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + tableName + "` WHERE `key` = ?")) {
             preparedStatement.setString(1, key);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -90,8 +74,7 @@ public class HikariEntityManager extends EntityManager {
     @Override
     public <V> List<V> findAll(String tableName, Class<V> vClass) {
         List<V> values = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + tableName + "`")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + tableName + "`")) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 values.add(gson.fromJson(resultSet.getString("json"), vClass));
@@ -104,8 +87,7 @@ public class HikariEntityManager extends EntityManager {
 
     @Override
     public boolean exists(String key, String tableName) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + tableName + "` WHERE `key` = ?")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `" + tableName + "` WHERE `key` = ?")) {
             preparedStatement.setString(1, key);
             return preparedStatement.executeQuery().next();
         } catch (Exception e) {
@@ -115,9 +97,8 @@ public class HikariEntityManager extends EntityManager {
     }
 
     @Override
-    public void createTable(GenericDao dao) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `" + dao.getTableName() + "`(`key` VARCHAR(64) NOT NULL, `json` TEXT NOT NULL, PRIMARY KEY (`key`))")) {
+    public void createTable(GenericDataManager dao) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `" + dao.getTableName() + "`(`key` VARCHAR(64) NOT NULL, `json` TEXT NOT NULL, PRIMARY KEY (`key`))")) {
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,10 +108,10 @@ public class HikariEntityManager extends EntityManager {
     @Override
     public void close() throws DatabaseException {
         try {
-            if (dataSource != null) {
-                dataSource.close();
+            if (connection != null) {
+                connection.close();
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new DatabaseException("não foi possivel fechar conexão com mysql", e);
         }
     }

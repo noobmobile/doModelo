@@ -6,7 +6,7 @@ import com.dont.modelo.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
-public abstract class DoListener implements Listener {
+public class DoListener implements Listener {
 
     protected final Terminal main;
     protected final MainDataManager manager;

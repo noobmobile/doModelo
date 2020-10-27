@@ -1,7 +1,7 @@
-package com.dont.modelo.database.managers;
+package com.dont.modelo.database.datasources;
 
 import com.dont.modelo.Terminal;
-import com.dont.modelo.database.dao.GenericDao;
+import com.dont.modelo.database.datamanagers.GenericDataManager;
 import com.dont.modelo.database.exceptions.DatabaseException;
 import com.dont.modelo.utils.Utils;
 
@@ -9,11 +9,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SQLLiteEntityManager extends EntityManager {
+public class SQLLiteDataSource extends AbstractDataSource {
 
     private Connection connection;
 
-    public SQLLiteEntityManager() throws DatabaseException {
+    public SQLLiteDataSource() throws DatabaseException {
         openConnection();
     }
 
@@ -98,7 +98,7 @@ public class SQLLiteEntityManager extends EntityManager {
     }
 
     @Override
-    public void createTable(GenericDao dao) {
+    public void createTable(GenericDataManager dao) {
         try (PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `" + dao.getTableName() + "`(`key` VARCHAR(64) NOT NULL, `json` TEXT NOT NULL, PRIMARY KEY (`key`))")) {
             preparedStatement.executeUpdate();
         } catch (Exception e) {

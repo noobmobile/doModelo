@@ -1,24 +1,26 @@
 package com.dont.modelo.database;
 
-import com.dont.modelo.database.dao.CachedDao;
-import com.dont.modelo.database.dao.GenericDao;
-import com.dont.modelo.database.managers.EntityManager;
+import com.dont.modelo.database.datamanagers.CachedDataManager;
+import com.dont.modelo.database.datasources.AbstractDataSource;
+import com.dont.modelo.models.database.Maquina;
 import com.dont.modelo.models.database.User;
+import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainDataManager {
 
-    public final CachedDao<String, User> USERS;
+    public final CachedDataManager<String, User> USERS;
+    public final CachedDataManager<Location, Maquina> MAQUINAS;
 
-    private final EntityManager entityManager;
-    private List<CachedDao> daos;
+    private List<CachedDataManager> daos;
 
-    public MainDataManager(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public MainDataManager(AbstractDataSource abstractDataSource) {
         this.daos = new ArrayList<>();
-        daos.add(USERS = new CachedDao<>(new GenericDao<>(entityManager, "dont.modelo", User.class)));
+        daos.add(USERS = new CachedDataManager<>(abstractDataSource, "dont.modelo", User.class));
+        daos.add(MAQUINAS = new CachedDataManager<>(abstractDataSource, "dont.maquinas", Maquina.class,
+                location -> location.getWorld().getName() + ";" + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ()));
 
     }
 

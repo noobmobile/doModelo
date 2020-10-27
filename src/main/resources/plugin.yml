@@ -3,5 +3,3 @@ author: dont
 version: 1.0
 main: com.dont.modelo.Terminal
 depend: [Vault]
-commands:
-  teste:

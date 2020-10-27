@@ -1,8 +1,8 @@
-package com.dont.modelo.database.managers;
+package com.dont.modelo.database.datasources;
 
 import com.dont.modelo.database.adapters.ItemStackAdapter;
 import com.dont.modelo.database.adapters.LocationAdapter;
-import com.dont.modelo.database.dao.GenericDao;
+import com.dont.modelo.database.datamanagers.GenericDataManager;
 import com.dont.modelo.database.exceptions.DatabaseException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class EntityManager {
+public abstract class AbstractDataSource {
 
     protected ExecutorService executor;
     protected Gson gson;
 
-    public EntityManager() throws DatabaseException {
+    public AbstractDataSource() throws DatabaseException {
         this.executor = Executors.newFixedThreadPool(3);
         this.gson = buildGson();
     }
@@ -41,7 +41,7 @@ public abstract class EntityManager {
 
     public abstract boolean exists(String key, String tableName);
 
-    public abstract void createTable(GenericDao dao);
+    public abstract void createTable(GenericDataManager dao);
 
     public abstract void close() throws DatabaseException;
 

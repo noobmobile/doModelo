@@ -1,5 +1,7 @@
-package com.dont.modelo.database.dao;
+package com.dont.modelo.database.datamanagers;
 
+import com.dont.modelo.database.Keyable;
+import com.dont.modelo.database.datasources.AbstractDataSource;
 import com.dont.modelo.utils.Utils;
 
 import java.util.Collection;
@@ -10,17 +12,22 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CachedDao<K, V> extends GenericDao<K, V> {
+public class CachedDataManager<K, V extends Keyable<K>> extends GenericDataManager<K, V> {
 
     private final Map<K, V> cache;
 
-    public CachedDao(GenericDao<K, V> other) {
-        super(other);
+    public CachedDataManager(AbstractDataSource abstractDataSource, String tableName, Class<V> vClass) {
+        super(abstractDataSource, tableName, vClass);
         this.cache = new HashMap<>();
     }
 
-    public void cache(K key, V value) {
-        this.cache.put(key, value);
+    public CachedDataManager(AbstractDataSource abstractDataSource, String tableName, Class<V> vClass, Function<K, String> keyAdapter) {
+        super(abstractDataSource, tableName, vClass, keyAdapter);
+        this.cache = new HashMap<>();
+    }
+
+    public void cache(V value) {
+        this.cache.put(value.getKey(), value);
     }
 
     public void uncache(K key) {
@@ -36,7 +43,7 @@ public class CachedDao<K, V> extends GenericDao<K, V> {
     }
 
     public void saveCached(boolean async) {
-        this.cache.forEach((key, value) -> super.insert(key, value, async));
+        this.cache.forEach((key, value) -> super.insert(value, async));
     }
 
     public Collection<V> getCached() {
@@ -45,7 +52,7 @@ public class CachedDao<K, V> extends GenericDao<K, V> {
 
     public Collection<V> getNonCached() {
         List<V> values = super.findAll();
-        values.removeIf(cache::containsValue);
+        values.removeIf(value -> cache.containsKey(value.getKey()));
         return values;
     }
 
@@ -58,7 +65,7 @@ public class CachedDao<K, V> extends GenericDao<K, V> {
     public void loadAll(Function<V, K> extractor) {
         Utils.measureTime(() -> {
             Collection<V> all = getNonCached();
-            all.forEach(v -> this.cache(extractor.apply(v), v));
+            all.forEach(this::cache);
             return "Carregado " + all.size() + " objetos em {time}";
         });
     }

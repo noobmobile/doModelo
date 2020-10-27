@@ -3,11 +3,11 @@ package com.dont.modelo.models;
 import com.dont.modelo.config.ConfigManager;
 import com.dont.modelo.database.AutoSave;
 import com.dont.modelo.database.MainDataManager;
+import com.dont.modelo.database.datasources.AbstractDataSource;
+import com.dont.modelo.database.datasources.HikariDataSource;
+import com.dont.modelo.database.datasources.MySQLDataSource;
+import com.dont.modelo.database.datasources.SQLLiteDataSource;
 import com.dont.modelo.database.exceptions.DatabaseException;
-import com.dont.modelo.database.managers.EntityManager;
-import com.dont.modelo.database.managers.HikariEntityManager;
-import com.dont.modelo.database.managers.MySQLEntityManager;
-import com.dont.modelo.database.managers.SQLLiteEntityManager;
 import com.dont.modelo.utils.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -22,7 +22,7 @@ public abstract class AbstractTerminal extends JavaPlugin {
     private Economy economy;
     private ConfigManager configManager;
     private Map<Class<? extends Manager>, Manager> managers;
-    protected EntityManager entityManager;
+    protected AbstractDataSource abstractDataSource;
     private MainDataManager mainDataManager;
 
 
@@ -67,9 +67,9 @@ public abstract class AbstractTerminal extends JavaPlugin {
 
     private void saveAll() {
         try {
-            if (entityManager == null) return;
+            if (abstractDataSource == null) return;
             mainDataManager.saveCached(false);
-            entityManager.close();
+            abstractDataSource.close();
         } catch (DatabaseException e) {
             e.printStackTrace();
         }
@@ -79,13 +79,13 @@ public abstract class AbstractTerminal extends JavaPlugin {
         try {
             String databaseType = getConfig().getString("Database.Tipo");
             if (databaseType.equalsIgnoreCase("MYSQL_POOLING")) {
-                entityManager = new HikariEntityManager(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+                abstractDataSource = new HikariDataSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
             } else if (databaseType.equalsIgnoreCase("MYSQL_PURO")) {
-                entityManager = new MySQLEntityManager(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
+                abstractDataSource = new MySQLDataSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
             } else {
-                entityManager = new SQLLiteEntityManager();
+                abstractDataSource = new SQLLiteDataSource();
             }
-            this.mainDataManager = new MainDataManager(entityManager);
+            this.mainDataManager = new MainDataManager(abstractDataSource);
             return true;
         } catch (DatabaseException e) {
             Utils.debug(Utils.LogType.INFO, "erro ao inicializar conexão com banco de dados");
