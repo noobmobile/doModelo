@@ -19,10 +19,7 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -135,7 +132,7 @@ public class ItemComposer {
 
     public ItemComposer addLore(List<String> lore) {
         composeMeta(meta -> {
-            List<String> newLore = meta.getLore();
+            List<String> newLore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
             newLore.addAll((lore));
             meta.setLore(newLore);
         });

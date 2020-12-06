@@ -127,7 +127,7 @@ public class SectionBuilder<T> {
             ConfigurationSection section = (ConfigurationSection) object;
 
             String url = !section.isSet("Texture") ? null : section.getString("Texture");
-            Material material = MATERIAL_ADAPTER.supply(section.get("Material"));
+            Material material = url == null ? MATERIAL_ADAPTER.supply(section.get("Material")) : null;
             int data = !section.isSet("Data") ? 0 : section.getInt("Data");
             int amount = !section.isSet("Quantidade") ? 1 : section.getInt("Quantidade");
             String name = !section.isSet("Nome") ? null : STRING_ADAPTER.supply(section.getString("Nome"));

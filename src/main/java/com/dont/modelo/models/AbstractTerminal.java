@@ -3,10 +3,7 @@ package com.dont.modelo.models;
 import com.dont.modelo.config.ConfigManager;
 import com.dont.modelo.database.AutoSave;
 import com.dont.modelo.database.MainDataManager;
-import com.dont.modelo.database.datasources.AbstractDataSource;
-import com.dont.modelo.database.datasources.HikariDataSource;
-import com.dont.modelo.database.datasources.MySQLDataSource;
-import com.dont.modelo.database.datasources.SQLLiteDataSource;
+import com.dont.modelo.database.datasources.*;
 import com.dont.modelo.database.exceptions.DatabaseException;
 import com.dont.modelo.utils.Utils;
 import net.milkbowl.vault.economy.Economy;
@@ -24,7 +21,6 @@ public abstract class AbstractTerminal extends JavaPlugin {
     private Map<Class<? extends Manager>, Manager> managers;
     protected AbstractDataSource abstractDataSource;
     private MainDataManager mainDataManager;
-
 
     @Override
     public void onEnable() {
@@ -82,8 +78,10 @@ public abstract class AbstractTerminal extends JavaPlugin {
                 abstractDataSource = new HikariDataSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
             } else if (databaseType.equalsIgnoreCase("MYSQL_PURO")) {
                 abstractDataSource = new MySQLDataSource(getConfig().getString("Database.IP"), getConfig().getString("Database.DB"), getConfig().getString("Database.User"), getConfig().getString("Database.Pass"));
-            } else {
+            } else if (databaseType.equalsIgnoreCase("SQLITE")) {
                 abstractDataSource = new SQLLiteDataSource();
+            } else {
+                abstractDataSource = new YamlDataSource();
             }
             this.mainDataManager = new MainDataManager(abstractDataSource);
             return true;

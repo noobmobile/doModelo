@@ -275,6 +275,11 @@ public class Scroller {
             return this;
         }
 
+        public Builder withItems(List<ItemStack> items, ItemStack ifEmpty) {
+            this.items = items.isEmpty() ? Arrays.asList(ifEmpty) : items;
+            return this;
+        }
+
         public Builder withOnChooseItem(BiConsumer<Player, ItemStack> onChooseItem) {
             this.onChooseItem = onChooseItem;
             return this;

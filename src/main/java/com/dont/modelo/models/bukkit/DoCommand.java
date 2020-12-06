@@ -2,6 +2,7 @@ package com.dont.modelo.models.bukkit;
 
 import com.dont.modelo.Terminal;
 import com.dont.modelo.database.MainDataManager;
+import com.dont.modelo.models.SectionManager;
 import com.dont.modelo.models.database.User;
 import com.dont.modelo.utils.Utils;
 import org.bukkit.Bukkit;
@@ -60,6 +61,10 @@ public abstract class DoCommand implements CommandExecutor {
 
     protected String validTypes(Class<? extends Enum> clazz) {
         return Arrays.stream((Enum<?>[]) clazz.getEnumConstants()).map(Enum::name).map(String::toLowerCase).collect(Collectors.joining(", "));
+    }
+
+    protected <V> String validTypes(SectionManager<String, V> sectionManager) {
+        return validTypes(sectionManager.getAll(), sectionManager.getExtractor());
     }
 
     protected Player parsePlayer(String arg) throws DoCommandException {

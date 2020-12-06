@@ -71,6 +71,12 @@ public class InventoryHandler {
         return this;
     }
 
+    public InventoryHandler item(Items.MenuItem menuItem, Consumer<Player> consumer) {
+        inventory.setItem(menuItem.getSlot(), menuItem.getItem());
+        customItems.put(menuItem.getSlot(), consumer);
+        return this;
+    }
+
     public InventoryHandler item(Items.MenuItem menuItem) {
         inventory.setItem(menuItem.getSlot(), menuItem.getItem());
         return this;
@@ -78,6 +84,12 @@ public class InventoryHandler {
 
     public InventoryHandler item(int slot, ItemStack item, Consumer<Player> consumer) {
         inventory.setItem(slot, item);
+        customItems.put(slot, consumer);
+        return this;
+    }
+
+    public InventoryHandler item(int slot, Items.MenuItem item, Consumer<Player> consumer) {
+        inventory.setItem(slot, item.getItem());
         customItems.put(slot, consumer);
         return this;
     }

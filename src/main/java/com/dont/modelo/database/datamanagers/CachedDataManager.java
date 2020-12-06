@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +63,20 @@ public class CachedDataManager<K, V extends Keyable<K>> extends GenericDataManag
         return Stream.of(cached, nonCached).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
-    public void loadAll(Function<V, K> extractor) {
+    public V load(K key, Supplier<V> supplier) {
+        if (isCached(key)) return getCached(key);
+        else if (exists(key)) {
+            V v = find(key);
+            cache(v);
+            return v;
+        } else {
+            V v = supplier.get();
+            cache(v);
+            return v;
+        }
+    }
+
+    public void loadAll() {
         Utils.measureTime(() -> {
             Collection<V> all = getNonCached();
             all.forEach(this::cache);
